@@ -5,57 +5,68 @@
 zhujuan::zhujuan()//猪圈的初始化构造
 {
     juanpig_num = 0;
-    head = nullptr;
+    head = NULL;
+    p = NULL;
+    p0 = NULL;
 }
 
-void zhujuan::add_pig(piglist *p ,int b,int day,int month)//新猪插入链尾并编号0-9
+void zhujuan::add_pig(piglist *p9 ,int b,int day,int month)//新猪插入链尾并编号0-9
 {
     juanpig_num++;
-    p->inday = day;
-    p->inmonth = month;
+    p9->inday = day;
+    p9->inmonth = month;
     if(head == NULL){
-        head = p;
-        p->zhu_no = 0;
+        head = p9;
+        p9->zhu_no = 0;
     }
     else {
-        piglist *p0;
-        p0 = head;
+        piglist *p8;
+        p8 = head;
         //        qDebug() << "下一句估计会报错";
-        for(int j =1; j<b&&p0;j++){
-            p0 = p0->next;
+        for(int j =1; j<b&&p8;j++){
+            p8 = p8->next;
         }
-        p0->next = p;
-        p->zhu_no = juanpig_num-1;
+        p8->next = p9;
+        p9->zhu_no = juanpig_num-1;
     }
 }
 
-void zhujuan::del_pig(piglist *p)//删除猪猪并重新为猪猪编号
+void zhujuan::del_pig(piglist *pc)//删除猪猪并重新为猪猪编号
 {
     if (juanpig_num == 1) {
-
+        cout ;
         head = NULL;
         delete p;
         p = NULL;
+        cout;
     }
     else if (p == head){
+        cout;
         head = p->next;
         delete p;
         p = head;
+        cout;
     }
 
     else{
         piglist *p0 = head;
-        while(p0->next != p)
+        cout;
+        while(p0->next != pc)
             p0 = p0->next;
-        p0->next = p->next;
-        delete p;
+        cout;
+        p0->next = pc->next;
+        cout;
+        delete pc;
+        cout;
         p = p0->next;
+        cout;
     }
+    cout;
     juanpig_num--;
-    piglist *p0 = head;
+    piglist *p1 = head;
     for(int i = 0;i<juanpig_num;i++){
-        p0->zhu_no = i;
-        p0 = p0->next;
+        p1->zhu_no = i;
+        p1 = p1->next;
     }
 }
 
@@ -128,9 +139,13 @@ double zhujuan::returnprice(int a,int &all0,int &all1, int &all2,int price0,int 
     double sellprice = 0;
     if (head == NULL )
         return 0;
-    piglist *p =head , *p1 = p;
+    cout << "juanpig_num:"<<juanpig_num;
+    //piglist *p =head , *p0 = p;
+    p =head;
+    p0 = p;
     for(int j = 0; j<a&&p; j++){
-        if (p->czmonth >= 12 || p->weight > 90){//设置卖猪的条件
+        cout << "j:" << j;
+        if (p->czmonth >= 12 || p->weight > 75){//设置卖猪的条件
             if(p->species == 0){
                 sellprice += price0*p->weight;
                 all0--;
@@ -143,11 +158,14 @@ double zhujuan::returnprice(int a,int &all0,int &all1, int &all2,int price0,int 
                 sellprice += price2*p->weight;
                 all2--;
             }
+            cout;
             del_pig(p);
             continue;
         }
-        p1 = p;
-        p  = p1->next;
+        cout;
+        p0 = p;
+        cout;
+        p  = p0->next;
     }
     return sellprice;
 }

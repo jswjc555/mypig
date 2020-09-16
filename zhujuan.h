@@ -20,6 +20,7 @@ private:
     int juanpig_no;//猪圈的编号0-99
     int juanpig_num;//本圈中猪的数量
     int spe0,spe1,spe2;//'0'代表黑猪，‘1’代表小花猪，‘2’代表大花白猪
+    piglist *p,*p0;
 public:
     zhujuan();
     piglist *head;

@@ -167,15 +167,17 @@ void MainWindow::chujuangouzhu()
 {
     if(fakemonth < 3){
         cout << "时间未过三个月，请耐心等待猪猪长大后再出圈哦~";
-    ui->mainlabel_right->setText(tr( "时间未过三个月，请耐心等待猪猪们长大后再出圈哦~" ));
+    ui->mainlabel_right->setText(tr( "时间未过三个月，请耐心\n等待猪猪们长大后再出圈哦~" ));
     }
     else {
         for(int i=0;i<100;i++){
+            cout << i <<"开始卖猪";
             sellprice   +=   pjuan[i]->returnprice(pjuan[i]->getjuanpig_num(),all0,all1,all2,price0,price1,price2);
             //           qDebug() << i << "圈卖猪" << sellprice;
         }
 
-        int a = rand()%30+70;//每次新购入70-100头猪
+        //int a = rand()%30+70;//每次新购入70-100头猪
+        int a = 100;
         int black=0,small=0,big=0;
         for(int i = 0;i < a;i++){
             piglist *p = new piglist;
@@ -209,24 +211,27 @@ void MainWindow::chujuangouzhu()
 
             if(pjuan[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
                 pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
-                flag = (flag+1)%100;
                 qDebug() << "购猪（空猪圈）"<< flag ;
+                flag = (flag+1)%100;
+
             }
             else {//否则判断是否为黑猪圈，flag移到合适的位置
-                if(pjuan[flag]->getjuanpig_num() == 10)//一个猪圈最多10只猪
-                    while(pjuan[flag]->getjuanpig_num() == 10)
+                if(pjuan[flag]->getjuanpig_num() >= 10)//一个猪圈最多10只猪
+                    while(pjuan[flag]->getjuanpig_num() >= 10)
                         flag = (flag+1)%100;
                 if(pjuan[flag]->getspecies(0) == 0 && p->species != 0){//黑猪只能进黑猪圈
                     while(pjuan[flag]->getspecies(0) == 0)
                         flag = (flag+1)%100;
                     qDebug() << "购猪，推移(花猪圈)"<< flag ;
                     pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
+                    flag = (flag+1)%100;
                 }
                 else if (pjuan[flag]->getspecies(0) != 0 && p->species == 0) {
-                    while(pjuan[flag]->getspecies(0) != 0)
+                    while(pjuan[flag]->getspecies(0) ==1 || pjuan[flag]->getspecies(0) == 2)
                         flag = (flag+1)%100;
                     qDebug() << "购猪，推移(黑猪圈)"<< flag ;
                     pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
+                    flag = (flag+1)%100;
                 }
                 else if (pjuan[flag]->getspecies(0) == 0 && p->species == 0) {
                     qDebug() << "购猪，(黑猪圈)"<< flag ;
