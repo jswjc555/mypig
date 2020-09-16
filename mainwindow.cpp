@@ -24,9 +24,13 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     pass_day = 10;
     all0 = 0; all1 =0; all2 = 0;
     weight0 =0;weight1 =0; weight2 =0;
-    for(int i=0;i<100;i++){//初始化zhujuan数组
+    for(int i=0;i<100;i++){//初始化zhujuan指针数组
         pjuan[i]=new zhujuan;
         pjuan[i]->setjuanpig_no(i);
+    }
+    for(int i=0;i<100;i++){//异常处理
+        if(pjuan[i] == NULL)
+             exit(1);
     }
 
     //第一次初始化，加点猪猪
@@ -176,7 +180,7 @@ void MainWindow::chujuangouzhu()
             //           qDebug() << i << "圈卖猪" << sellprice;
         }
 
-        //int a = rand()%30+70;//每次新购入70-100头猪
+       // int a = rand()%30+70;//每次新购入70-100头猪
         int a = 100;
         int black=0,small=0,big=0;
         for(int i = 0;i < a;i++){
@@ -381,7 +385,7 @@ void MainWindow::getfeedtime_all()
     feed3 = 0;feed6 = 0;
     feed9 = 0;feed12 = 0;
     for(int i=0;i<100;i++){
-        for(int j = 0;j<pjuan[i]->getjuanpig_num();j++)
+        for(int j = 0;j<pjuan[i]->getjuanpig_num();j++){
             switch (pjuan[i]->getczmonth(j)) {
             case 0:case 1: case 2:
             {feed3++;break;}
@@ -392,6 +396,7 @@ void MainWindow::getfeedtime_all()
             default:
             {feed12++;break;}
             }
+        }
     }
 }
 
@@ -443,23 +448,25 @@ void MainWindow::save_game()//保存当前文件的最基本的重要数据，�
     QString str = QString::number(day)+"\n" +QString::number(month)+"\n"+QString::number(year)+"\n"+QString::number(fakemonth)+"\n"+QString::number(allprice)+"\n"
             +QString::number(all0)+"\n"+QString::number(all1)+"\n"+QString::number(all2)+"\n"+QString::number(weight0)+"\n"+QString::number(weight1)+"\n"
             +QString::number(weight2)+"\n"+QString::number(feed3)+"\n"+QString::number(feed6)+"\n"+QString::number(feed9)+"\n"+QString::number(feed12)+"\n";
-    for(int i=0;i<allpig;i++){
+
+    for(int i=0;i<allpig;i++){//读现有的猪的个数
          while(p == NULL){
              flag++;
              p = pjuan[flag]->head;
          }
         str += QString::number(p->weight)+"\n"+QString::number(p->species)+"\n"+QString::number(p->czday)+"\n"+QString::number(p->czmonth)+"\n"+
                 QString::number(p->inday)+"\n"+QString::number(p->inmonth)+"\n";
-        if(p->next != NULL)
+        if(p->next != NULL){
             p = p->next;
-        else {
-            flag++;
-            p = pjuan[flag]->head;
         }
-        ui->mainlabel_right->setText(tr( "保存当前游戏数据成功" ));
+        else {
+            if(flag <99)
+              flag++;
+            p = pjuan[flag]->head;    
+        }
+
     }
-
-
+    ui->mainlabel_right->setText(tr( "保存当前游戏数据成功" ));
     txtOutput << str << endl;
     f.close();
 }
@@ -497,7 +504,15 @@ void MainWindow::read_game()
     weight1 = lineStr.toInt();
     lineStr = txtInput.readLine();
     weight2 = lineStr.toInt();
-    for(int i;i<100;i++)
+    lineStr = txtInput.readLine();
+    feed3 = lineStr.toInt();
+    lineStr = txtInput.readLine();
+    feed6 = lineStr.toInt();
+    lineStr = txtInput.readLine();
+    feed9 = lineStr.toInt();
+    lineStr = txtInput.readLine();
+    feed12 = lineStr.toInt();
+    for(int i;i<100;i++)//释放初始化的猪圈动态地址
       if(pjuan[i]->head == NULL)
             continue;
       else {
@@ -527,61 +542,33 @@ void MainWindow::read_game()
         p->inday = lineStr.toInt();
         lineStr = txtInput.readLine();
         p->inmonth = lineStr.toInt();
-        cout <<i;
     if(pjuan[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
-        cout << i;
-        pjuan[flag]->plus_num();
-        pjuan[flag]->head = p;
+        pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
         flag = (flag+1)%100;
     }
     else {
-        cout << i;
-        piglist *p0;//否则判断是否为黑猪圈，flag移到合适的位置
-        if(pjuan[flag]->getjuanpig_num() == 10)//一个猪圈最多10只猪
-            while(pjuan[flag]->getjuanpig_num() == 10)
+        //piglist *p0;//否则判断是否为黑猪圈，flag移到合适的位置
+        if(pjuan[flag]->getjuanpig_num() >= 10)//一个猪圈最多10只猪
+            while(pjuan[flag]->getjuanpig_num() >= 10)
                 flag = (flag+1)%100;
         if(pjuan[flag]->getspecies(0) == 0 && p->species != 0){//黑猪只能进黑猪圈
             while(pjuan[flag]->getspecies(0) == 0)
                 flag = (flag+1)%100;
-            p0 = pjuan[flag]->head;
-            for(int j =1; j<pjuan[flag]->getjuanpig_num()&&p0;j++){
-                p0 = p0->next;
-            }
-            p0->next = p;
-            p->zhu_no = pjuan[flag]->getjuanpig_num();
-            pjuan[flag]->plus_num();
+            pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
         else if (pjuan[flag]->getspecies(0) != 0 && p->species == 0) {
-            while(pjuan[flag]->getspecies(0) != 0)
+            while(pjuan[flag]->getspecies(0) == 1 || pjuan[flag]->getspecies(0) == 2)
                 flag = (flag+1)%100;
-            p0 = pjuan[flag]->head;
-            for(int j =1; j<pjuan[flag]->getjuanpig_num()&&p0;j++){
-                p0 = p0->next;
-            }
-            p0->next = p;
-            p->zhu_no = pjuan[flag]->getjuanpig_num();
-            pjuan[flag]->plus_num();
+            pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
         else if (pjuan[flag]->getspecies(0) == 0 && p->species == 0) {
-            p0 = pjuan[flag]->head;
-            for(int j =1; j<pjuan[flag]->getjuanpig_num()&&p0;j++){
-                p0 = p0->next;
-            }
-            p0->next = p;
-            p->zhu_no = pjuan[flag]->getjuanpig_num();
-            pjuan[flag]->plus_num();
+           pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
         else {
-            p0 = pjuan[flag]->head;
-            for(int j =1; j<pjuan[flag]->getjuanpig_num()&&p0;j++){
-                p0 = p0->next;
-            }
-            p0->next = p;
-            p->zhu_no = pjuan[flag]->getjuanpig_num();
-            pjuan[flag]->plus_num();
+            pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
       }
@@ -642,29 +629,35 @@ void MainWindow::on_checkpig_clicked()
     juan_no = ui->juanpig_no->text().toInt();
     pig_no = ui->pig_no->text().toInt();
     if(ui->juanpig_no->text().isEmpty()||ui->pig_no->text().isEmpty()){
-        cout << "请输入猪圈编号(0-99)，和猪编号(0-9)";
         ui->checklabel_right->setText("查询失败！\n请正确输入猪圈编号(0-99)，和猪编号(0-9)");
     }
     else{
         qDebug() << juan_no << "号猪圈" << pig_no << "号猪"  ;
-        pjuan[juan_no]->show_zhuzhu(pig_no);
-        QImage *image = new QImage;
-        if(pjuan[juan_no]->getspecies(pig_no) == 0){
-            if(pjuan[juan_no]->getweight(pig_no) <=40){
-                image->load(":/pig_image/0_1.png");
-                ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+        cout;
+        if(pig_no > pjuan[juan_no]->getjuanpig_num()-1){
+            ui->checklabel_right->setText("查无此猪");
+        }
+        else{
+            //pjuan[juan_no]->show_zhuzhu(pig_no);
+            QImage *image = new QImage;
+            if(pjuan[juan_no]->getspecies(pig_no) == 0){
+                if(pjuan[juan_no]->getweight(pig_no) <=40){
+                    image->load(":/pig_image/0_1.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+                else if (pjuan[juan_no]->getweight(pig_no)>40&&pjuan[juan_no]->getweight(pig_no)<=90) {
+                    image->load(":/pig_image/0_2.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+                else if (pjuan[juan_no]->getweight(pig_no) >90) {
+                    image->load(":/pig_image/0_3.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
             }
-            else if (pjuan[juan_no]->getweight(pig_no)>40&&pjuan[juan_no]->getweight(pig_no)<=90) {
-                image->load(":/pig_image/0_2.png");
-                ui->pig_image->setPixmap(QPixmap::fromImage(*image));
-            }
-            else if (pjuan[juan_no]->getweight(pig_no) >90) {
-                image->load(":/pig_image/0_3.png");
-                ui->pig_image->setPixmap(QPixmap::fromImage(*image));
-            }
+
+            ui->checklabel_right->setText(pjuan[juan_no]->show_zhuzhu(pig_no));
         }
 
-        ui->checklabel_right->setText(pjuan[juan_no]->show_zhuzhu(pig_no));
     }
 
 }
@@ -678,6 +671,7 @@ void MainWindow::on_startgame_clicked()
 void MainWindow::on_to_check_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->pagecheck);
+    ui->checklabel_right->setText("请输入猪圈编号(0-99)\n和猪编号(0-9)");
 }
 
 void MainWindow::on_back_main_clicked()

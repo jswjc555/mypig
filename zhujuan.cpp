@@ -145,7 +145,7 @@ double zhujuan::returnprice(int a,int &all0,int &all1, int &all2,int price0,int 
     p0 = p;
     for(int j = 0; j<a&&p; j++){
         cout << "j:" << j;
-        if (p->czmonth >= 12 || p->weight > 75){//设置卖猪的条件
+        if (p->czmonth >= 12 || p->weight > 130){//设置卖猪的条件
             if(p->species == 0){
                 sellprice += price0*p->weight;
                 all0--;
@@ -195,9 +195,6 @@ QString zhujuan::show_zhuzhu(int a)
     piglist *p =head;
     QString str;
     double localprice;
-    if(a > juanpig_num-1)
-        cout << "查无此猪";
-    else{
         for(int i = 0; i<a&&p; i++){
             p = p->next;
         }
@@ -218,7 +215,7 @@ QString zhujuan::show_zhuzhu(int a)
         }
         qDebug() << "该猪入圈时间是第" << p->inmonth << "月，第" << p->inday << "天\n"
                  << "已经在这个猪圈里生活了" << p->czmonth << "个月" << p->czday << "天，该猪体重是" << p->weight << "公斤，可以卖" << localprice << "元";
-    }
+
     if(p->weight <=40)
         str +="时期 ： 幼崽期\n\n\n";
     else if (p->weight >40&&p->weight<=90) {
@@ -233,7 +230,6 @@ QString zhujuan::show_zhuzhu(int a)
             +"战斗力：5\n\n\n"
             +"建议零售价："+QString::number(localprice)+"元";
     return str ;
-
 }
 
 void zhujuan::plus_num()
