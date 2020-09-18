@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="pagestart">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -106,9 +106,9 @@
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>580</y>
+        <y>470</y>
         <width>231</width>
-        <height>171</height>
+        <height>281</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="buttonlayout">
@@ -123,6 +123,20 @@
         <widget class="QPushButton" name="stoppig">
          <property name="text">
           <string>暂停</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="plague_pig">
+         <property name="text">
+          <string>模拟猪瘟</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="geli">
+         <property name="text">
+          <string>加装隔离带</string>
          </property>
         </widget>
        </item>
@@ -161,7 +175,7 @@
        <rect>
         <x>10</x>
         <y>540</y>
-        <width>541</width>
+        <width>551</width>
         <height>201</height>
        </rect>
       </property>
@@ -191,7 +205,7 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>771</width>
+        <width>551</width>
         <height>51</height>
        </rect>
       </property>
@@ -217,7 +231,7 @@
         <x>562</x>
         <y>33</y>
         <width>221</width>
-        <height>271</height>
+        <height>261</height>
        </rect>
       </property>
       <property name="font">
@@ -235,10 +249,10 @@
      <widget class="QLabel" name="mainlabel_down">
       <property name="geometry">
        <rect>
-        <x>562</x>
-        <y>303</y>
+        <x>560</x>
+        <y>300</y>
         <width>221</width>
-        <height>271</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="font">

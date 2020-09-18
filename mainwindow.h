@@ -4,14 +4,15 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTimer>
-#include <QProgressBar>//养猪进度条
 #include <cstdlib>
+#include "zhujuan.h"
+#include <QProgressBar>
 #include <QDebug>
 #include <QString>
-#include "zhujuan.h"
 #include <QtCharts>
 #include <QBarSet>
 #include <QFile>
+#include <QMessageBox>
 QT_CHARTS_USE_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -33,6 +34,9 @@ public:
     void qt_read_txt();
     void save_game();
     void read_game();
+    void initplague();
+    int MyMessageBox2(QString title, QString message);
+
 private:
     int day;//进行的总时间
     int month,fakemonth;
@@ -40,7 +44,7 @@ private:
     int pass_day;//每一跳度过的时间
     double sellprice;
     double allprice;
-    int all0,all1,all2;//种类个数统计
+    int all0,all1,all2,allplague;//种类个数统计
     int sellpig[3][5] ,buypig[3][5];
     int sellpriceyear[5] ;
     double weight0,weight1,weight2;//种类体重统计
@@ -48,6 +52,7 @@ private:
     zhujuan *pjuan[100];//100个猪圈
     int flag;//新猪平均分配
     int tm_startID;
+    bool isplaue;
     int price0,price1,price2;
     QChart *chart,*chart1,*chart2;
 
@@ -59,7 +64,9 @@ private slots:
 
 
     void on_startpig_clicked();
+
     void on_stoppig_clicked();
+
     void on_sellpig_clicked();
 
     void on_checkjuan_clicked();
@@ -79,6 +86,10 @@ private slots:
     void on_savebutton_clicked();
 
     void on_readbutton_clicked();
+
+    void on_plague_pig_clicked();
+
+    void on_geli_clicked();
 
 protected:
     void timerEvent(QTimerEvent *event);

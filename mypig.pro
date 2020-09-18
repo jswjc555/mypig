@@ -35,8 +35,7 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-DISTFILES += \
-    456.txt
+DISTFILES +=
 
 RESOURCES += \
     pig_image.qrc

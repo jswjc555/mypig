@@ -8,25 +8,27 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
 {
     ui->setupUi(this);
     this->setWindowTitle("养猪模拟");
-    resize(800,750);
-    ui->stackedWidget->resize(800,750);
+    resize(800,770);
+    ui->stackedWidget->resize(800,770);
     day = 0;
     month = 0;
     year = 0;
     fakemonth = 0;
     flag = 0;
     sellprice = 0;
+    isplaue = false;
 
     memset(sellpig,0,sizeof(sellpig));
     memset(buypig,0,sizeof(buypig));
     memset(sellpriceyear,0,sizeof(sellpriceyear));
     allprice = 10000 ;
     pass_day = 10;
-    all0 = 0; all1 =0; all2 = 0;
+    all0 = 0; all1 =0; all2 = 0; allplague = 0;
     weight0 =0;weight1 =0; weight2 =0;
     for(int i=0;i<100;i++){//初始化zhujuan指针数组
         pjuan[i]=new zhujuan;
         pjuan[i]->setjuanpig_no(i);
+        pjuan[i]->setspread(0);
     }
     for(int i=0;i<100;i++){//异常处理
         if(pjuan[i] == NULL)
@@ -66,6 +68,27 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
         flag++;
     }
 
+    //瘟疫数组初始化
+    for(int i=0;i<100;i++)
+    {
+        for(int j=0;j<10;j++){
+            if(j<pjuan[i]->getjuanpig_num())
+                pjuan[i]->setplague(j,0);
+            else {
+                pjuan[i]->setplague(j,-1);
+            }
+        }
+    }
+
+//    for(int i=0;i<100;i++)
+//    {
+//        for(int j=0;j<10;j++){
+//            qDebug() << pjuan[i]->getisplague(j);
+//        }
+//        cout << i;
+//    }
+
+
     ui->stackedWidget->setCurrentWidget(ui->pagestart);
     ui->juanpig_no->setPlaceholderText("猪圈编号0-99");
     ui->juanpig_no->setAlignment(Qt::AlignCenter);
@@ -76,6 +99,7 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     ui->daytbar->setRange(0,90);
     ui->daytbar->setValue(0);
     ui->sellpig->setVisible(false);
+    ui->stoppig->setVisible(false);
     ui->mainlabel_up->setText(tr( "现在是%1年 %2月  %3日\n 金钱：%4元" ).arg( year ).arg( month ).arg( day ).arg(allprice));
     ui->mainlabel_right->setText(tr( "你拥有100个猪圈\n开场你有10000元\n%1只黑猪崽儿\n%2只小花猪崽儿\n%3只大花白猪崽儿\n"
                                      "只有在游戏时间进行中\n猪猪们才会增长体重\n每种品种的肉价\n会随着时间流逝随机波动\n挑选最好的时机出圈吧！" ).arg(all0).arg(all1).arg(all2));
@@ -147,15 +171,54 @@ void MainWindow::updateprogress(){
              }
 
            }
-
+          if(isplaue == true && pjuan[i]->getspread()!=0){//专注本猪圈的传播，并且若传播成功改变周围猪圈传播模式
+              int a = rand()%100;
+              if(pjuan[i]->getspread() == 2)//50%传播几率
+                  for(int j = 0;pjuan[i]->getisplague(j)!=-1;j++){
+                      if(pjuan[i]->getisplague(j) == 1)
+                          continue;
+                      a = rand()%100;
+                      if(a > 50){
+                          pjuan[i]->setplague(j,1);
+                          allplague++;
+                          cout << i <<"号圈" << j << "号猪因50%的几率感染了瘟疫" <<a;
+                      }
+                  }
+              else if (pjuan[i]->getspread() == 1) {
+                 for(int j = 0;pjuan[i]->getisplague(j)!=-1;j++){
+                     a = rand()%100;
+                     if(a > 85){
+                         pjuan[i]->setplague(j,1);
+                         allplague++;
+                         cout << i <<"号圈" << j << "号猪因15%的几率感染了瘟疫" << a ;
+                         if(i == 0 ){//对第一只瘟猪的猪圈传播模式作初始化
+                             pjuan[i]->setspread(2);
+                             if(pjuan[i+1]->getspread() == 0)
+                                 pjuan[i+1]->setspread(1);
+                         }
+                         else if (i == 99) {
+                             pjuan[i]->setspread(2);
+                             if(pjuan[i-1]->getspread() == 0)
+                                 pjuan[i-1]->setspread(1);
+                         }
+                         else {
+                             if(pjuan[i+1]->getspread() == 0)
+                                   pjuan[i+1]->setspread(1);
+                             pjuan[i]->setspread(2);
+                             if(pjuan[i-1]->getspread() == 0)
+                                   pjuan[i-1]->setspread(1);
+                         }
+                     }
+                 }
+              }
+           }
         }
+
         price0 = rand()% 10 +20;
         price1 = rand()% 12 +8 ;
         price2 = rand()%8  + 8;
         qDebug() << "时间过去了" << tm_now << "天";
-//        qDebug() << "all0=" << all0 << "all1" << all1 << "all2" << all2<<endl;
-//        qDebug() << "weight0=" << weight0 << "weight1" << weight1 << "weight2" << weight2 << endl;
-            qDebug() << "现在是第"  << year  << "年，" << "第" << month << "个月，第" << day << "天" ;
+        qDebug() << "现在是第"  << year  << "年，" << "第" << month << "个月，第" << day << "天" ;
        ui->mainlabel_right->setText(tr( "养猪场经过了%1天，\n猪猪正在茁壮成长" ).arg( tm_now ));
        ui->mainlabel_down->setText(tr("         市场价目表：\n 黑猪肉：%1    元/公斤\n 小花猪肉：%2    元/公斤\n 大花白猪肉：%3    元/公斤").arg(price0).arg(price1).arg(price2));
        ui->mainlabel_up->setText(tr( "现在是%1年 %2月  %3日\n 金钱：%4元" ).arg( year ).arg( month ).arg( day ).arg(allprice));
@@ -249,6 +312,20 @@ void MainWindow::chujuangouzhu()
                 }
             }
         }
+        for(int i=0;i<100;i++)//初始化
+        {
+            for(int j=0;j<10;j++){
+                if(j<pjuan[i]->getjuanpig_num())
+                    if(pjuan[i]->getisplague(j) == 1)
+                        continue;
+                    else {
+                       pjuan[i]->setplague(j,0);
+                    }
+                else {
+                    pjuan[i]->setplague(j,-1);
+                }
+            }
+        }
         allprice += sellprice;
         sellpriceyear[year] += sellprice;
         qDebug() << "这次卖了" << sellprice << "元,你现在一共有"<< allprice<<"元请继续加油哦";
@@ -307,7 +384,11 @@ void MainWindow::chushihuachart()
 void MainWindow::chushihuachart1()
 {
     QBarSet *set0 = new QBarSet("个数");
+    if(isplaue == false)
     *set0 << all0 << all1 << all2 ;
+    else {
+       *set0 << all0 << all1 << all2 << allplague;
+    }
     QBarSeries *series = new QBarSeries();
     series->append(set0);
     series->setLabelsPosition(QAbstractBarSeries::LabelsInsideEnd);
@@ -320,7 +401,11 @@ void MainWindow::chushihuachart1()
 
 
     QStringList categories;
+    if (isplaue == false)
     categories << "黑猪" << "小花猪" << "大花白猪";
+    else {
+       categories << "黑猪" << "小花猪" << "大花白猪"<<"瘟猪";
+    }
     QBarCategoryAxis *axis = new QBarCategoryAxis();
     axis->append(categories);
     chart1->createDefaultAxes();//创建默认的左侧的坐标轴（根据 QBarSet 设置的值）
@@ -402,7 +487,7 @@ void MainWindow::getfeedtime_all()
 
 void MainWindow::qt_write_txt()
 {
-    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\123.csv");
+    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\5yearlog.csv");
     if(!f.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         qDebug() << ("打开文件失败");
@@ -419,7 +504,7 @@ void MainWindow::qt_write_txt()
 
 void MainWindow::qt_read_txt()
 {
-    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\123.csv");
+    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\5yearlog.csv");
     if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << ("打开文件失败");
@@ -436,7 +521,7 @@ void MainWindow::qt_read_txt()
 
 void MainWindow::save_game()//保存当前文件的最基本的重要数据，需要下一次打开时点击读取上次数据后可以使用
 {
-    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\456.txt");
+    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\save.txt");
     if(!f.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         qDebug() << ("打开文件失败");
@@ -475,7 +560,7 @@ void MainWindow::read_game()
 {
     flag = 0;//部分初始化
     pass_day = 10;
-    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\456.txt");
+    QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\save.txt");
     if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << ("打开文件失败");
@@ -584,15 +669,97 @@ void MainWindow::read_game()
     f.close();
 }
 
+void MainWindow::initplague()
+{
+    isplaue = true;
+    allplague += 1;
+    int plague =0;//随机选一只猪得瘟疫，plague等于1的时候跳出循环
+    int num0 = all0+all1+all2;
+    int num = rand()%(num0);
+    cout <<num;
+    int flag,no;
+    for (int i =0;i<100;i++){
+        for(int j=0;j<10;j++){
+            if(num == 0){
+                pjuan[i]->setplague(j,1);
+                flag = i;
+                no =j;
+                plague =1;
+                break;
+            }
+            else if(pjuan[i]->getisplague(j) == 0){
+                num--;
+                if(j == pjuan[i]->getjuanpig_num()-1)
+                    break;
+            }
+            else if (pjuan[i]->getisplague(j) == -1) {
+                j = 10;
+            }
+
+        }
+        if(plague == 1)
+            break;
+    }
+    if(flag == 0 ){//对第一只瘟猪的猪圈传播模式作初始化
+        pjuan[flag]->setspread(2);
+        if(pjuan[flag+1]->getspread() == 0)
+            pjuan[flag+1]->setspread(1);
+    }
+    else if (flag == 99) {
+        pjuan[flag]->setspread(2);
+        if(pjuan[flag-1]->getspread() == 0)
+            pjuan[flag-1]->setspread(1);
+    }
+    else {
+        if(pjuan[flag+1]->getspread() == 0)
+              pjuan[flag+1]->setspread(1);
+        pjuan[flag]->setspread(2);
+        if(pjuan[flag-1]->getspread() == 0)
+              pjuan[flag-1]->setspread(1);
+    }
+
+    cout << flag << "号圈" << no << "号猪得了猪瘟" ;
+    cout << pjuan[flag-1]->getspread();
+    cout << pjuan[flag]->getspread();
+    cout << pjuan[flag+1]->getspread();
+        for(int i=0;i<100;i++)
+        {
+            for(int j=0;j<10;j++){
+                qDebug() << pjuan[i]->getisplague(j);
+            }
+            cout << i;
+        }
+        chushihuachart1();
+}
+
+int MainWindow::MyMessageBox2(QString title, QString message)
+{
+     QMessageBox mymessage(QMessageBox::Information, title, message);
+     QPushButton *btnYes = mymessage.addButton(("加装猪圈隔离带"), QMessageBox::YesRole);
+     QPushButton *btnNo = mymessage.addButton(("加装猪圈隔离带（强）"), QMessageBox::NoRole);
+     mymessage.resize(400,300);
+     mymessage.exec();
+     if ((QPushButton*)mymessage.clickedButton() == btnYes)
+             return 1;
+     else if ((QPushButton*)mymessage.clickedButton() == btnNo) {
+         return 0;
+     }
+     return 0;
+}
+
 
 
 void MainWindow::on_startpig_clicked()
 {
     tm_startID = this->startTimer(500);
+    ui->startpig->setVisible(false);
+    ui->stoppig->setVisible(true);
 }
 void MainWindow::on_stoppig_clicked()
 {
     killTimer(tm_startID);
+    ui->startpig->setVisible(true);
+    ui->stoppig->setVisible(false);
 }
 void MainWindow::on_sellpig_clicked()
 {
@@ -609,6 +776,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
         updateprogress();
         chushihuachart2();
         chushihuachart();
+        chushihuachart1();
     }
 }
 
@@ -698,4 +866,25 @@ void MainWindow::on_readbutton_clicked()
 {
    read_game();
    ui->stackedWidget->setCurrentWidget(ui->pagemain);
+}
+
+void MainWindow::on_plague_pig_clicked()
+{
+    qDebug() << "猪瘟模式启动！！！，有一只瘟猪加入了你的猪圈，并在传播瘟疫。";
+    initplague();
+}
+
+void MainWindow::on_geli_clicked()
+{
+    int fifteen=0,fifty=0;
+    for(int i = 0;i<100;i++)
+        if(pjuan[i]->getspread() == 1)
+            fifteen++;
+        else if (pjuan[i]->getspread() == 2) {
+            fifty++;
+        }
+    int a = MyMessageBox2("芜湖342134312412341234123","起飞2342342314\n213423142342314\n23412");
+    cout<<a;
+
+
 }
