@@ -25,13 +25,13 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     pass_day = 10;
     all0 = 0; all1 =0; all2 = 0; allplague = 0;
     weight0 =0;weight1 =0; weight2 =0;
-    for(int i=0;i<100;i++){//初始化zhujuan指针数组
-        pjuan[i]=new zhujuan;
-        pjuan[i]->setjuanpig_no(i);
-        pjuan[i]->setspread(0);
+    for(int i=0;i<100;i++){//初始化hogpen指针数组
+        hogpen[i]=new zhujuan;
+        hogpen[i]->setjuanpig_no(i);
+        hogpen[i]->setspread(0);
     }
     for(int i=0;i<100;i++){//异常处理
-        if(pjuan[i] == NULL)
+        if(hogpen[i] == NULL)
              exit(1);
     }
 
@@ -49,18 +49,18 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
         p->czmonth = 0;
         p->species = rand()%3;
         p->weight = rand()%30+10;
-        pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);//初始化不用判断是否为黑猪圈
-        if(pjuan[i]->getspecies(0) == 0){
+        hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);//初始化不用判断是否为黑猪圈
+        if(hogpen[i]->getspecies(0) == 0){
             all0++;
             weight0 += p->weight;
             buypig[0][year]++;
         }
-        else if (pjuan[i]->getspecies(0) == 1) {
+        else if (hogpen[i]->getspecies(0) == 1) {
             all1++;
              weight1 += p->weight;
              buypig[1][year]++;
         }
-        else if (pjuan[i]->getspecies(0) == 2) {
+        else if (hogpen[i]->getspecies(0) == 2) {
             all2++;
              weight2 += p->weight;
              buypig[2][year]++;
@@ -72,10 +72,10 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     for(int i=0;i<100;i++)
     {
         for(int j=0;j<10;j++){
-            if(j<pjuan[i]->getjuanpig_num())
-                pjuan[i]->setplague(j,0);
+            if(j<hogpen[i]->getjuanpig_num())
+                hogpen[i]->setplague(j,0);
             else {
-                pjuan[i]->setplague(j,-1);
+                hogpen[i]->setplague(j,-1);
             }
         }
     }
@@ -83,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
 //    for(int i=0;i<100;i++)
 //    {
 //        for(int j=0;j<10;j++){
-//            qDebug() << pjuan[i]->getisplague(j);
+//            qDebug() << hogpen[i]->getisplague(j);
 //        }
 //        cout << i;
 //    }
@@ -152,61 +152,61 @@ void MainWindow::updateprogress(){
             month -= 12;
         }
         for(int i=0;i<100;i++){
-            pjuan[i]->pig_grow(pass_day,pjuan[i]->getjuanpig_num());//改时间
-            for(int j=0;j<pjuan[i]->getjuanpig_num();j++){
-              switch (pjuan[i]->getspecies(j)) {//记录此次购入猪的种类
+            hogpen[i]->pig_grow(pass_day,hogpen[i]->getjuanpig_num());//改时间
+            for(int j=0;j<hogpen[i]->getjuanpig_num();j++){
+              switch (hogpen[i]->getspecies(j)) {//记录此次购入猪的种类
                 case 0:{
-                    weight0 += pjuan[i]->getweight(j);
+                    weight0 += hogpen[i]->getweight(j);
                     break;
                 }
                 case 1:{
-                    weight1 += pjuan[i]->getweight(j);
+                    weight1 += hogpen[i]->getweight(j);
                     break;
                 }
                 case 2:{
-                    weight2 += pjuan[i]->getweight(j);
+                    weight2 += hogpen[i]->getweight(j);
                     break;
                }
 
              }
 
            }
-          if(isplaue == true && pjuan[i]->getspread()!=0){//专注本猪圈的传播，并且若传播成功改变周围猪圈传播模式
+          if(isplaue == true && hogpen[i]->getspread()!=0){//专注本猪圈的传播，并且若传播成功改变周围猪圈传播模式
               int a = rand()%100;
-              if(pjuan[i]->getspread() == 2)//50%传播几率
-                  for(int j = 0;pjuan[i]->getisplague(j)!=-1;j++){
-                      if(pjuan[i]->getisplague(j) == 1)
+              if(hogpen[i]->getspread() == 2)//50%传播几率
+                  for(int j = 0;hogpen[i]->getisplague(j)!=-1;j++){
+                      if(hogpen[i]->getisplague(j) == 1)
                           continue;
                       a = rand()%100;
                       if(a > 50){
-                          pjuan[i]->setplague(j,1);
+                          hogpen[i]->setplague(j,1);
                           allplague++;
                           cout << i <<"号圈" << j << "号猪因50%的几率感染了瘟疫" <<a;
                       }
                   }
-              else if (pjuan[i]->getspread() == 1) {
-                 for(int j = 0;pjuan[i]->getisplague(j)!=-1;j++){
+              else if (hogpen[i]->getspread() == 1) {
+                 for(int j = 0;hogpen[i]->getisplague(j)!=-1;j++){
                      a = rand()%100;
                      if(a > 85){
-                         pjuan[i]->setplague(j,1);
+                         hogpen[i]->setplague(j,1);
                          allplague++;
                          cout << i <<"号圈" << j << "号猪因15%的几率感染了瘟疫" << a ;
                          if(i == 0 ){//对第一只瘟猪的猪圈传播模式作初始化
-                             pjuan[i]->setspread(2);
-                             if(pjuan[i+1]->getspread() == 0)
-                                 pjuan[i+1]->setspread(1);
+                             hogpen[i]->setspread(2);
+                             if(hogpen[i+1]->getspread() == 0)
+                                 hogpen[i+1]->setspread(1);
                          }
                          else if (i == 99) {
-                             pjuan[i]->setspread(2);
-                             if(pjuan[i-1]->getspread() == 0)
-                                 pjuan[i-1]->setspread(1);
+                             hogpen[i]->setspread(2);
+                             if(hogpen[i-1]->getspread() == 0)
+                                 hogpen[i-1]->setspread(1);
                          }
                          else {
-                             if(pjuan[i+1]->getspread() == 0)
-                                   pjuan[i+1]->setspread(1);
-                             pjuan[i]->setspread(2);
-                             if(pjuan[i-1]->getspread() == 0)
-                                   pjuan[i-1]->setspread(1);
+                             if(hogpen[i+1]->getspread() == 0)
+                                   hogpen[i+1]->setspread(1);
+                             hogpen[i]->setspread(2);
+                             if(hogpen[i-1]->getspread() == 0)
+                                   hogpen[i-1]->setspread(1);
                          }
                      }
                  }
@@ -239,7 +239,7 @@ void MainWindow::chujuangouzhu()
     else {
         for(int i=0;i<100;i++){
             cout << i <<"开始卖猪";
-            sellprice   +=   pjuan[i]->returnprice(pjuan[i]->getjuanpig_num(),all0,all1,all2,price0,price1,price2);
+            sellprice   +=   hogpen[i]->returnprice(hogpen[i]->getjuanpig_num(),all0,all1,all2,price0,price1,price2);
             //           qDebug() << i << "圈卖猪" << sellprice;
         }
 
@@ -274,40 +274,40 @@ void MainWindow::chujuangouzhu()
             }
 
             }
-            qDebug() << "准备在" << flag << "圈加新猪" <<p->species<< "该圈是" << pjuan[flag]->getspecies(0);
+            qDebug() << "准备在" << flag << "圈加新猪" <<p->species<< "该圈是" << hogpen[flag]->getspecies(0);
 
-            if(pjuan[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
-                pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
+            if(hogpen[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
+                hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                 qDebug() << "购猪（空猪圈）"<< flag ;
                 flag = (flag+1)%100;
 
             }
             else {//否则判断是否为黑猪圈，flag移到合适的位置
-                if(pjuan[flag]->getjuanpig_num() >= 10)//一个猪圈最多10只猪
-                    while(pjuan[flag]->getjuanpig_num() >= 10)
+                if(hogpen[flag]->getjuanpig_num() >= 10)//一个猪圈最多10只猪
+                    while(hogpen[flag]->getjuanpig_num() >= 10)
                         flag = (flag+1)%100;
-                if(pjuan[flag]->getspecies(0) == 0 && p->species != 0){//黑猪只能进黑猪圈
-                    while(pjuan[flag]->getspecies(0) == 0)
+                if(hogpen[flag]->getspecies(0) == 0 && p->species != 0){//黑猪只能进黑猪圈
+                    while(hogpen[flag]->getspecies(0) == 0)
                         flag = (flag+1)%100;
                     qDebug() << "购猪，推移(花猪圈)"<< flag ;
-                    pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
+                    hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
-                else if (pjuan[flag]->getspecies(0) != 0 && p->species == 0) {
-                    while(pjuan[flag]->getspecies(0) ==1 || pjuan[flag]->getspecies(0) == 2)
+                else if (hogpen[flag]->getspecies(0) != 0 && p->species == 0) {
+                    while(hogpen[flag]->getspecies(0) ==1 || hogpen[flag]->getspecies(0) == 2)
                         flag = (flag+1)%100;
                     qDebug() << "购猪，推移(黑猪圈)"<< flag ;
-                    pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
+                    hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
-                else if (pjuan[flag]->getspecies(0) == 0 && p->species == 0) {
+                else if (hogpen[flag]->getspecies(0) == 0 && p->species == 0) {
                     qDebug() << "购猪，(黑猪圈)"<< flag ;
-                    pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
+                    hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
                 else {
                     qDebug() << "购猪，(花猪圈)"<< flag ;
-                    pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),day,month);
+                    hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
             }
@@ -315,14 +315,14 @@ void MainWindow::chujuangouzhu()
         for(int i=0;i<100;i++)//初始化
         {
             for(int j=0;j<10;j++){
-                if(j<pjuan[i]->getjuanpig_num())
-                    if(pjuan[i]->getisplague(j) == 1)
+                if(j<hogpen[i]->getjuanpig_num())
+                    if(hogpen[i]->getisplague(j) == 1)
                         continue;
                     else {
-                       pjuan[i]->setplague(j,0);
+                       hogpen[i]->setplague(j,0);
                     }
                 else {
-                    pjuan[i]->setplague(j,-1);
+                    hogpen[i]->setplague(j,-1);
                 }
             }
         }
@@ -344,7 +344,7 @@ void MainWindow::chujuangouzhu()
 MainWindow::~MainWindow()
 {
     delete ui;
-    //delete []pjuan; qt对象树构造特性，只要继承于QWeidge就不用写delete，自动delete
+    //delete []hogpen; qt对象树构造特性，只要继承于QWeidge就不用写delete，自动delete
 }
 
 int MainWindow::getday()
@@ -470,8 +470,8 @@ void MainWindow::getfeedtime_all()
     feed3 = 0;feed6 = 0;
     feed9 = 0;feed12 = 0;
     for(int i=0;i<100;i++){
-        for(int j = 0;j<pjuan[i]->getjuanpig_num();j++){
-            switch (pjuan[i]->getczmonth(j)) {
+        for(int j = 0;j<hogpen[i]->getjuanpig_num();j++){
+            switch (hogpen[i]->getczmonth(j)) {
             case 0:case 1: case 2:
             {feed3++;break;}
             case 3:case 4:case 5:
@@ -528,7 +528,7 @@ void MainWindow::save_game()//保存当前文件的最基本的重要数据，�
     }
     int allpig = all0+all1+all2;
     int flag=0;//此flag非彼flag
-    piglist *p = pjuan[0]->head;
+    piglist *p = hogpen[0]->head;
     QTextStream txtOutput(&f);
     QString str = QString::number(day)+"\n" +QString::number(month)+"\n"+QString::number(year)+"\n"+QString::number(fakemonth)+"\n"+QString::number(allprice)+"\n"
             +QString::number(all0)+"\n"+QString::number(all1)+"\n"+QString::number(all2)+"\n"+QString::number(weight0)+"\n"+QString::number(weight1)+"\n"
@@ -537,7 +537,7 @@ void MainWindow::save_game()//保存当前文件的最基本的重要数据，�
     for(int i=0;i<allpig;i++){//读现有的猪的个数
          while(p == NULL){
              flag++;
-             p = pjuan[flag]->head;
+             p = hogpen[flag]->head;
          }
         str += QString::number(p->weight)+"\n"+QString::number(p->species)+"\n"+QString::number(p->czday)+"\n"+QString::number(p->czmonth)+"\n"+
                 QString::number(p->inday)+"\n"+QString::number(p->inmonth)+"\n";
@@ -547,7 +547,7 @@ void MainWindow::save_game()//保存当前文件的最基本的重要数据，�
         else {
             if(flag <99)
               flag++;
-            p = pjuan[flag]->head;    
+            p = hogpen[flag]->head;
         }
 
     }
@@ -598,10 +598,10 @@ void MainWindow::read_game()
     lineStr = txtInput.readLine();
     feed12 = lineStr.toInt();
     for(int i;i<100;i++)//释放初始化的猪圈动态地址
-      if(pjuan[i]->head == NULL)
+      if(hogpen[i]->head == NULL)
             continue;
       else {
-          piglist *p0 = pjuan[flag]->head,*p ;
+          piglist *p0 = hogpen[flag]->head,*p ;
           while(p0->next)
           {
               p = p0->next;
@@ -609,7 +609,7 @@ void MainWindow::read_game()
               p0 =p;
           }
           delete p0;
-         pjuan[i]->head = NULL;
+         hogpen[i]->head = NULL;
       }
     int flag=0;
     int allpig = all0+all1+all2;
@@ -627,33 +627,33 @@ void MainWindow::read_game()
         p->inday = lineStr.toInt();
         lineStr = txtInput.readLine();
         p->inmonth = lineStr.toInt();
-    if(pjuan[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
-        pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
+    if(hogpen[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
+        hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),p->inday,p->inmonth);
         flag = (flag+1)%100;
     }
     else {
         //piglist *p0;//否则判断是否为黑猪圈，flag移到合适的位置
-        if(pjuan[flag]->getjuanpig_num() >= 10)//一个猪圈最多10只猪
-            while(pjuan[flag]->getjuanpig_num() >= 10)
+        if(hogpen[flag]->getjuanpig_num() >= 10)//一个猪圈最多10只猪
+            while(hogpen[flag]->getjuanpig_num() >= 10)
                 flag = (flag+1)%100;
-        if(pjuan[flag]->getspecies(0) == 0 && p->species != 0){//黑猪只能进黑猪圈
-            while(pjuan[flag]->getspecies(0) == 0)
+        if(hogpen[flag]->getspecies(0) == 0 && p->species != 0){//黑猪只能进黑猪圈
+            while(hogpen[flag]->getspecies(0) == 0)
                 flag = (flag+1)%100;
-            pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
+            hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
-        else if (pjuan[flag]->getspecies(0) != 0 && p->species == 0) {
-            while(pjuan[flag]->getspecies(0) == 1 || pjuan[flag]->getspecies(0) == 2)
+        else if (hogpen[flag]->getspecies(0) != 0 && p->species == 0) {
+            while(hogpen[flag]->getspecies(0) == 1 || hogpen[flag]->getspecies(0) == 2)
                 flag = (flag+1)%100;
-            pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
+            hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
-        else if (pjuan[flag]->getspecies(0) == 0 && p->species == 0) {
-           pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
+        else if (hogpen[flag]->getspecies(0) == 0 && p->species == 0) {
+           hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
         else {
-            pjuan[flag]->add_pig(p,pjuan[flag]->getjuanpig_num(),p->inday,p->inmonth);
+            hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),p->inday,p->inmonth);
             flag = (flag+1)%100;
         }
       }
@@ -681,18 +681,18 @@ void MainWindow::initplague()
     for (int i =0;i<100;i++){
         for(int j=0;j<10;j++){
             if(num == 0){
-                pjuan[i]->setplague(j,1);
+                hogpen[i]->setplague(j,1);
                 flag = i;
                 no =j;
                 plague =1;
                 break;
             }
-            else if(pjuan[i]->getisplague(j) == 0){
+            else if(hogpen[i]->getisplague(j) == 0){
                 num--;
-                if(j == pjuan[i]->getjuanpig_num()-1)
+                if(j == hogpen[i]->getjuanpig_num()-1)
                     break;
             }
-            else if (pjuan[i]->getisplague(j) == -1) {
+            else if (hogpen[i]->getisplague(j) == -1) {
                 j = 10;
             }
 
@@ -701,42 +701,42 @@ void MainWindow::initplague()
             break;
     }
     if(flag == 0 ){//对第一只瘟猪的猪圈传播模式作初始化
-        pjuan[flag]->setspread(2);
-        if(pjuan[flag+1]->getspread() == 0)
-            pjuan[flag+1]->setspread(1);
+        hogpen[flag]->setspread(2);
+        if(hogpen[flag+1]->getspread() == 0)
+            hogpen[flag+1]->setspread(1);
     }
     else if (flag == 99) {
-        pjuan[flag]->setspread(2);
-        if(pjuan[flag-1]->getspread() == 0)
-            pjuan[flag-1]->setspread(1);
+        hogpen[flag]->setspread(2);
+        if(hogpen[flag-1]->getspread() == 0)
+            hogpen[flag-1]->setspread(1);
     }
     else {
-        if(pjuan[flag+1]->getspread() == 0)
-              pjuan[flag+1]->setspread(1);
-        pjuan[flag]->setspread(2);
-        if(pjuan[flag-1]->getspread() == 0)
-              pjuan[flag-1]->setspread(1);
+        if(hogpen[flag+1]->getspread() == 0)
+              hogpen[flag+1]->setspread(1);
+        hogpen[flag]->setspread(2);
+        if(hogpen[flag-1]->getspread() == 0)
+              hogpen[flag-1]->setspread(1);
     }
 
     cout << flag << "号圈" << no << "号猪得了猪瘟" ;
-    cout << pjuan[flag-1]->getspread();
-    cout << pjuan[flag]->getspread();
-    cout << pjuan[flag+1]->getspread();
+    cout << hogpen[flag-1]->getspread();
+    cout << hogpen[flag]->getspread();
+    cout << hogpen[flag+1]->getspread();
         for(int i=0;i<100;i++)
         {
             for(int j=0;j<10;j++){
-                qDebug() << pjuan[i]->getisplague(j);
+                qDebug() << hogpen[i]->getisplague(j);
             }
             cout << i;
         }
         chushihuachart1();
 }
 
-int MainWindow::MyMessageBox2(QString title, QString message)
+int MainWindow::MyMessageBox(QString title, QString message)
 {
      QMessageBox mymessage(QMessageBox::Information, title, message);
-     QPushButton *btnYes = mymessage.addButton(("加装猪圈隔离带"), QMessageBox::YesRole);
-     QPushButton *btnNo = mymessage.addButton(("加装猪圈隔离带（强）"), QMessageBox::NoRole);
+     QPushButton *btnYes = mymessage.addButton(("猪圈隔离"), QMessageBox::YesRole);
+     QPushButton *btnNo = mymessage.addButton(("**猪栏隔离**"), QMessageBox::NoRole);
      mymessage.resize(400,300);
      mymessage.exec();
      if ((QPushButton*)mymessage.clickedButton() == btnYes)
@@ -787,7 +787,7 @@ void MainWindow::on_checkjuan_clicked()
     if(ui->juanpig_no->text().isEmpty())
         cout << "请输入0-99的猪圈编号";
     else
-    pjuan[juan_no]->show_zhujuan(pjuan[juan_no]->getjuanpig_num());
+    hogpen[juan_no]->show_zhujuan(hogpen[juan_no]->getjuanpig_num());
 
 }
 
@@ -802,28 +802,28 @@ void MainWindow::on_checkpig_clicked()
     else{
         qDebug() << juan_no << "号猪圈" << pig_no << "号猪"  ;
         cout;
-        if(pig_no > pjuan[juan_no]->getjuanpig_num()-1){
+        if(pig_no > hogpen[juan_no]->getjuanpig_num()-1){
             ui->checklabel_right->setText("查无此猪");
         }
         else{
-            //pjuan[juan_no]->show_zhuzhu(pig_no);
+            //hogpen[juan_no]->show_zhuzhu(pig_no);
             QImage *image = new QImage;
-            if(pjuan[juan_no]->getspecies(pig_no) == 0){
-                if(pjuan[juan_no]->getweight(pig_no) <=40){
+            if(hogpen[juan_no]->getspecies(pig_no) == 0){
+                if(hogpen[juan_no]->getweight(pig_no) <=40){
                     image->load(":/pig_image/0_1.png");
                     ui->pig_image->setPixmap(QPixmap::fromImage(*image));
                 }
-                else if (pjuan[juan_no]->getweight(pig_no)>40&&pjuan[juan_no]->getweight(pig_no)<=90) {
+                else if (hogpen[juan_no]->getweight(pig_no)>40&&hogpen[juan_no]->getweight(pig_no)<=90) {
                     image->load(":/pig_image/0_2.png");
                     ui->pig_image->setPixmap(QPixmap::fromImage(*image));
                 }
-                else if (pjuan[juan_no]->getweight(pig_no) >90) {
+                else if (hogpen[juan_no]->getweight(pig_no) >90) {
                     image->load(":/pig_image/0_3.png");
                     ui->pig_image->setPixmap(QPixmap::fromImage(*image));
                 }
             }
 
-            ui->checklabel_right->setText(pjuan[juan_no]->show_zhuzhu(pig_no));
+            ui->checklabel_right->setText(hogpen[juan_no]->show_zhuzhu(pig_no));
         }
 
     }
@@ -878,13 +878,33 @@ void MainWindow::on_geli_clicked()
 {
     int fifteen=0,fifty=0;
     for(int i = 0;i<100;i++)
-        if(pjuan[i]->getspread() == 1)
+        if(hogpen[i]->getspread() == 1)
             fifteen++;
-        else if (pjuan[i]->getspread() == 2) {
+        else if (hogpen[i]->getspread() == 2) {
             fifty++;
         }
-    int a = MyMessageBox2("芜湖342134312412341234123","起飞2342342314\n213423142342314\n23412");
-    cout<<a;
+    int fifteencash,allcash,allfif;
+    allfif = fifteen+fifty;
+    fifteencash = fifteen*888;
+    allcash = allfif*3888;
+    QString str;
+    str = "可以选择的隔离措施有：\n ***猪圈隔离***（瘟疫不会再传入设置隔离栏的猪圈）\n ***猪栏隔离***（瘟疫不再会在猪与猪之间传播）\n猪圈隔离栏：888元/个  猪栏隔离 3888元/圈\n";
+    str += "瘟猪圈   " + QString::number(fifteen) + "个，共需要" + QString::number(fifteencash) + "元\n"
+           "瘟猪栏   " + QString::number(allfif) + "个，共需要" + QString::number(allcash)+"元";
+    int a = MyMessageBox("选择隔离措施",str);
+    if (a == 1){
+          for(int i = 0;i<100;i++){
+             if(hogpen[i]->getspread() == 1)
+                  hogpen[i]->setgeli();
+          }
+          allprice -= fifteencash;
 
-
+    }
+    else{
+         for(int i = 0;i<100;i++){
+             if(hogpen[i]->getspread() == 1 || hogpen[i]->getspread() == 2)
+                  hogpen[i]->setgeli();
+        }
+        allprice -= allcash;
+    }
 }

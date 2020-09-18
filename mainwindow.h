@@ -35,7 +35,7 @@ public:
     void save_game();
     void read_game();
     void initplague();
-    int MyMessageBox2(QString title, QString message);
+    int MyMessageBox(QString title, QString message);
 
 private:
     int day;//进行的总时间
@@ -49,7 +49,7 @@ private:
     int sellpriceyear[5] ;
     double weight0,weight1,weight2;//种类体重统计
     int feed3,feed6,feed9,feed12;//饲养时间分布
-    zhujuan *pjuan[100];//100个猪圈
+    zhujuan *hogpen[100];//100个猪圈
     int flag;//新猪平均分配
     int tm_startID;
     bool isplaue;
