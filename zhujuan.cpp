@@ -237,3 +237,28 @@ void zhujuan::plus_num()
     juanpig_num++;
 }
 
+int zhujuan::getisplague(int a)
+{
+    return plaguepig[a];
+}
+
+void zhujuan::setplague(int a,int b)
+{
+    plaguepig[a] = b;
+}
+
+void zhujuan::setspread(int a)
+{
+    spread =a;
+}
+
+int zhujuan::getspread()
+{
+    return spread;
+}
+
+void zhujuan::setgeli()
+{
+    spread = 9;
+}
+
