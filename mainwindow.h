@@ -44,6 +44,7 @@ private:
     int pass_day;//每一跳度过的时间
     double sellprice;
     double allprice;
+    int maxprice0,maxprice1,maxprice2;
     int all0,all1,all2,allplague;//种类个数统计
     int sellpig[3][5] ,buypig[3][5];
     int sellpriceyear[5] ;
@@ -90,6 +91,12 @@ private slots:
     void on_plague_pig_clicked();
 
     void on_geli_clicked();
+
+    void on_closebutton_clicked();
+
+    void on_savebutton_2_clicked();
+
+    void on_closebutton_2_clicked();
 
 protected:
     void timerEvent(QTimerEvent *event);
