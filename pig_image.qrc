@@ -3,5 +3,14 @@
         <file>pig_image/0_1.png</file>
         <file>pig_image/0_2.png</file>
         <file>pig_image/0_3.png</file>
+        <file>pig_image/pochan.png</file>
+        <file>pig_image/1_1.png</file>
+        <file>pig_image/zhuwen.png</file>
+        <file>pig_image/2_1.png</file>
+        <file>pig_image/1_2.png</file>
+        <file>pig_image/1_3.png</file>
+        <file>pig_image/2_2.png</file>
+        <file>pig_image/2_3.png</file>
+        <file>pig_image/none.png</file>
     </qresource>
 </RCC>

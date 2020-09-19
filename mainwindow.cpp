@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     memset(sellpig,0,sizeof(sellpig));
     memset(buypig,0,sizeof(buypig));
     memset(sellpriceyear,0,sizeof(sellpriceyear));
-    allprice = 10000 ;
+    allprice = 100000 ;
     pass_day = 10;
     all0 = 0; all1 =0; all2 = 0; allplague = 0;
     weight0 =0;weight1 =0; weight2 =0;
@@ -40,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     price0 = rand()% 10 +20;
     price1 = rand()% 12 +8 ;
     price2 = rand()%8  +8;
+    maxprice0 = price0;
+    maxprice1 = price1;
+    maxprice2 = price2;
     int a = rand()%20+10;//开始拥有随机10-30头猪
     qDebug() << "初始有" << a << "头猪" ;
     for(int i = 0; i < a;i++){
@@ -100,12 +103,14 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     ui->daytbar->setValue(0);
     ui->sellpig->setVisible(false);
     ui->stoppig->setVisible(false);
+    ui->geli->setVisible(false);
     ui->mainlabel_up->setText(tr( "现在是%1年 %2月  %3日\n 金钱：%4元" ).arg( year ).arg( month ).arg( day ).arg(allprice));
     ui->mainlabel_right->setText(tr( "你拥有100个猪圈\n开场你有10000元\n%1只黑猪崽儿\n%2只小花猪崽儿\n%3只大花白猪崽儿\n"
                                      "只有在游戏时间进行中\n猪猪们才会增长体重\n每种品种的肉价\n会随着时间流逝随机波动\n挑选最好的时机出圈吧！" ).arg(all0).arg(all1).arg(all2));
     ui->mainlabel_down->setText(tr("         市场价目表：\n 黑猪肉：%1        元/公斤\n 小花猪肉：%2      元/公斤\n 大花白猪肉：%3    元/公斤")
                                 .arg(price0).arg(price1).arg(price2));
     ui->pig_image->setScaledContents(true);
+    ui->end_image->setScaledContents(true);
 
 
     chushihuachart();
@@ -133,6 +138,8 @@ void MainWindow::updateprogress(){
         qDebug() << "时间暂停,已经过去了3个月\n可以选择卖猪啦！";
         ui->mainlabel_right->setText(tr( "时间暂停\n已经过去了3个月\n可以选择卖猪啦！" ));
         ui->sellpig->setVisible(true);
+        ui->startpig->setVisible(true);
+        ui->stoppig->setVisible(false);
         chushihuachart();
         chushihuachart1();
     }
@@ -151,7 +158,10 @@ void MainWindow::updateprogress(){
             year++;
             month -= 12;
         }
+        cout;
+        QString str = "养猪场经过了" +QString::number(tm_now)+ "天，\n猪猪正在茁壮成长\n";
         for(int i=0;i<100;i++){
+            cout <<i;
             hogpen[i]->pig_grow(pass_day,hogpen[i]->getjuanpig_num());//改时间
             for(int j=0;j<hogpen[i]->getjuanpig_num();j++){
               switch (hogpen[i]->getspecies(j)) {//记录此次购入猪的种类
@@ -181,6 +191,7 @@ void MainWindow::updateprogress(){
                       if(a > 50){
                           hogpen[i]->setplague(j,1);
                           allplague++;
+                          str += QString::number(i) + "号圈" + QString::number(j) +"号猪感染瘟疫\n";
                           cout << i <<"号圈" << j << "号猪因50%的几率感染了瘟疫" <<a;
                       }
                   }
@@ -190,7 +201,8 @@ void MainWindow::updateprogress(){
                      if(a > 85){
                          hogpen[i]->setplague(j,1);
                          allplague++;
-                         cout << i <<"号圈" << j << "号猪因15%的几率感染了瘟疫" << a ;
+                         str += QString::number(i) + "号圈" + QString::number(j) +"号猪感染瘟疫\n";
+                         cout << i <<"号圈" << j << "号猪感染瘟疫" << a ;
                          if(i == 0 ){//对第一只瘟猪的猪圈传播模式作初始化
                              hogpen[i]->setspread(2);
                              if(hogpen[i+1]->getspread() == 0)
@@ -211,19 +223,37 @@ void MainWindow::updateprogress(){
                      }
                  }
               }
+             if(allplague >= all0+all1+all2){
+                 ui->stackedWidget->setCurrentWidget(ui->pageend);
+                 QImage *image = new QImage;
+                 image->load(":/pig_image/zhuwen.png");
+                 ui->end_image->setPixmap(QPixmap::fromImage(*image));
+                 ui->endlabel_down->setText(tr("猪场开业后的第%1 年的 %2 月 %3日 所有的猪都感染了\n非洲瘟疫 \n游戏结束┭┮﹏┭┮").arg(year).arg(month).arg(day));
+                 killTimer(tm_startID);
+             }
            }
         }
-
-        price0 = rand()% 10 +20;
-        price1 = rand()% 12 +8 ;
-        price2 = rand()%8  + 8;
+        int a0,a1,a2;
+        a0 = rand()%30+1;
+        a1 = rand()%24+1;
+        a2 = rand()% 16+1;
+        price0 = rand()% a0 +20;
+        price1 = rand()% a1 +8 ;
+        price2 = rand()% a2 + 8;
+        if (price0 > maxprice0)
+            maxprice0 = price0;
+        else if (price1 > maxprice1) {
+            maxprice1 = price1;
+        }
+        else if (price2 > maxprice2) {
+           maxprice2 = price2;
+        }
         qDebug() << "时间过去了" << tm_now << "天";
         qDebug() << "现在是第"  << year  << "年，" << "第" << month << "个月，第" << day << "天" ;
-       ui->mainlabel_right->setText(tr( "养猪场经过了%1天，\n猪猪正在茁壮成长" ).arg( tm_now ));
-       ui->mainlabel_down->setText(tr("         市场价目表：\n 黑猪肉：%1    元/公斤\n 小花猪肉：%2    元/公斤\n 大花白猪肉：%3    元/公斤").arg(price0).arg(price1).arg(price2));
+        ui->mainlabel_right->setText(str);
+       ui->mainlabel_down->setText(tr("         市场价目表：\n 黑猪肉：%1    元/公斤\n历史最高价：%4    元/公斤\n 小花猪肉：%2    元/公斤\n历史最高价：%5     元/公斤\n"
+                                      " 大花白猪肉：%3    元/公斤\n历史最高价：    %6元/公斤").arg(price0).arg(price1).arg(price2).arg(maxprice0).arg(maxprice1).arg(maxprice2));
        ui->mainlabel_up->setText(tr( "现在是%1年 %2月  %3日\n 金钱：%4元" ).arg( year ).arg( month ).arg( day ).arg(allprice));
-
-
    }
 
 
@@ -243,9 +273,8 @@ void MainWindow::chujuangouzhu()
             //           qDebug() << i << "圈卖猪" << sellprice;
         }
 
-       // int a = rand()%30+70;//每次新购入70-100头猪
-        int a = 100;
-        int black=0,small=0,big=0;
+        int a = rand()%40+70;//每次新购入70-100头猪
+        int black=0,small=0,big=0,buyprice=0;
         for(int i = 0;i < a;i++){
             piglist *p = new piglist;
             p->next = NULL;
@@ -258,24 +287,26 @@ void MainWindow::chujuangouzhu()
                 black++;
                 all0++;
                 weight0 += p->weight;
+                buyprice += 1000;//黑猪幼崽600元
                 break;
             }
             case 1:{
                 small++;
                 all1++;
                 weight1 += p->weight;
+                buyprice += 400;//小花猪幼崽400元
                 break;
             }
             case 2:{
                 big++;
                 all2++;
                 weight2 += p->weight;
+                buyprice += 250;
                 break;
             }
 
             }
             qDebug() << "准备在" << flag << "圈加新猪" <<p->species<< "该圈是" << hogpen[flag]->getspecies(0);
-
             if(hogpen[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
                 hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                 qDebug() << "购猪（空猪圈）"<< flag ;
@@ -327,19 +358,27 @@ void MainWindow::chujuangouzhu()
             }
         }
         allprice += sellprice;
+        allprice -= buyprice;
+
         sellpriceyear[year] += sellprice;
         qDebug() << "这次卖了" << sellprice << "元,你现在一共有"<< allprice<<"元请继续加油哦";
         buypig[0][year] += black;
         buypig[1][year] += small;
         buypig[2][year] += big  ;
         qDebug() << "此次购入" << a << "头猪其中" << black << "只黑猪" << small << "只小花猪" << big << "只大花白猪" ;
-        ui->mainlabel_right->setText(tr( "这次卖了%1元\n此次购入%2头猪\n其中%3只黑猪崽儿\n%4只小花猪崽儿\n%5只大花白猪崽儿" )
-                                     .arg(sellprice).arg(a).arg(black).arg(small).arg(big));
+        ui->mainlabel_right->setText(tr( "这次卖了%1元\n此次购入%2头猪\n其中%3只黑猪崽儿\n%4只小花猪崽儿\n%5只大花白猪崽儿\n共花费 %6 元" )
+                                     .arg(sellprice).arg(a).arg(black).arg(small).arg(big).arg(buyprice));
         ui->mainlabel_up->setText(tr( "现在是%1年 %2月  %3日\n 金钱：%4元" ).arg( year ).arg( month ).arg( day ).arg(allprice));
         sellprice =0;
         fakemonth -= 3;
     }
-
+    if(allprice <0 ){
+        ui->stackedWidget->setCurrentWidget(ui->pageend);
+        QImage *image = new QImage;
+        image->load(":/pig_image/pochan.png");
+        ui->end_image->setPixmap(QPixmap::fromImage(*image));
+        ui->endlabel_down->setText(tr("猪场开业后的第%1 年的 %2 月 %3日，负债破产┭┮﹏┭┮").arg(year).arg(month).arg(day));
+    }
 }
 MainWindow::~MainWindow()
 {
@@ -504,6 +543,7 @@ void MainWindow::qt_write_txt()
 
 void MainWindow::qt_read_txt()
 {
+    QString str;
     QFile f("S:\\qt\\Examples\\xiaobaichengxu\\mypig\\5yearlog.csv");
     if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -514,7 +554,8 @@ void MainWindow::qt_read_txt()
     while(!txtInput.atEnd())
     {
         lineStr = txtInput.readLine();
-        qDebug() << (lineStr);
+        str += lineStr + "\n";
+        ui->pig_image->setText(str);
     }
     f.close();
 }
@@ -717,18 +758,21 @@ void MainWindow::initplague()
         if(hogpen[flag-1]->getspread() == 0)
               hogpen[flag-1]->setspread(1);
     }
-
+    QString str = "警告⚠\n";
+    str += QString::number(flag) + "圈"  + QString::number(no) + "号猪，得了猪瘟。\n"
+           "瘟猪肉不可出售\n每一次时间的流过\n相邻猪圈的猪有15%\n的概率被传染\n"
+           "同一猪圈的猪有50%\n的几率被传染\n请尽快采取隔离措施!!";
+    ui->mainlabel_right->setText(str);
     cout << flag << "号圈" << no << "号猪得了猪瘟" ;
     cout << hogpen[flag-1]->getspread();
     cout << hogpen[flag]->getspread();
     cout << hogpen[flag+1]->getspread();
-        for(int i=0;i<100;i++)
-        {
-            for(int j=0;j<10;j++){
-                qDebug() << hogpen[i]->getisplague(j);
-            }
-            cout << i;
-        }
+//        for(int i=0;i<100;i++)
+//        {
+//            for(int j=0;j<10;j++){
+//                qDebug() << hogpen[i]->getisplague(j);
+//            }
+//        }
         chushihuachart1();
 }
 
@@ -773,6 +817,7 @@ void MainWindow::on_sellpig_clicked()
 void MainWindow::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == tm_startID){
+        cout;
         updateprogress();
         chushihuachart2();
         chushihuachart();
@@ -802,12 +847,15 @@ void MainWindow::on_checkpig_clicked()
     else{
         qDebug() << juan_no << "号猪圈" << pig_no << "号猪"  ;
         cout;
+        QImage *image = new QImage;
         if(pig_no > hogpen[juan_no]->getjuanpig_num()-1){
             ui->checklabel_right->setText("查无此猪");
+            image->load(":/pig_image/none.png");
+            ui->pig_image->setPixmap(QPixmap::fromImage(*image));
         }
         else{
             //hogpen[juan_no]->show_zhuzhu(pig_no);
-            QImage *image = new QImage;
+
             if(hogpen[juan_no]->getspecies(pig_no) == 0){
                 if(hogpen[juan_no]->getweight(pig_no) <=40){
                     image->load(":/pig_image/0_1.png");
@@ -822,6 +870,35 @@ void MainWindow::on_checkpig_clicked()
                     ui->pig_image->setPixmap(QPixmap::fromImage(*image));
                 }
             }
+            else if (hogpen[juan_no]->getspecies(pig_no) == 1) {
+                if(hogpen[juan_no]->getweight(pig_no) <=40){
+                    image->load(":/pig_image/1_1.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+                else if (hogpen[juan_no]->getweight(pig_no)>40&&hogpen[juan_no]->getweight(pig_no)<=90) {
+                    image->load(":/pig_image/1_2.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+                else if (hogpen[juan_no]->getweight(pig_no) >90) {
+                    image->load(":/pig_image/1_3.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+            }
+            else if (hogpen[juan_no]->getspecies(pig_no) == 2) {
+                if(hogpen[juan_no]->getweight(pig_no) <=40){
+                    image->load(":/pig_image/2_2.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+                else if (hogpen[juan_no]->getweight(pig_no)>40&&hogpen[juan_no]->getweight(pig_no)<=90) {
+                    image->load(":/pig_image/2_1.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+                else if (hogpen[juan_no]->getweight(pig_no) >90) {
+                    image->load(":/pig_image/2_3.png");
+                    ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+                }
+            }
+
 
             ui->checklabel_right->setText(hogpen[juan_no]->show_zhuzhu(pig_no));
         }
@@ -839,7 +916,8 @@ void MainWindow::on_startgame_clicked()
 void MainWindow::on_to_check_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->pagecheck);
-    ui->checklabel_right->setText("请输入猪圈编号(0-99)\n和猪编号(0-9)");
+    ui->checklabel_right->setText("请在下方输入猪圈\n编号(0-99)\n和猪编号(0-9)");
+    ui->pig_image->setText("请在下方输入猪圈编号(0-99)\n和猪编号(0-9)");
 }
 
 void MainWindow::on_back_main_clicked()
@@ -872,6 +950,9 @@ void MainWindow::on_plague_pig_clicked()
 {
     qDebug() << "猪瘟模式启动！！！，有一只瘟猪加入了你的猪圈，并在传播瘟疫。";
     initplague();
+    ui->geli->setVisible(true);
+    ui->savebutton->setVisible(false);
+    ui->savebutton_2->setVisible(false);
 }
 
 void MainWindow::on_geli_clicked()
@@ -907,4 +988,28 @@ void MainWindow::on_geli_clicked()
         }
         allprice -= allcash;
     }
+    if(allprice <0 ){
+        ui->stackedWidget->setCurrentWidget(ui->pageend);
+        QImage *image = new QImage;
+        image->load(":/pig_image/pochan.png");
+        ui->end_image->setPixmap(QPixmap::fromImage(*image));
+        ui->endlabel_down->setText(tr("猪场开业后的第%1 年的 %2 月 %3日，负债破产┭┮﹏┭┮").arg(year).arg(month).arg(day));
+    }
+    ui->mainlabel_up->setText(tr( "现在是%1年 %2月  %3日\n 金钱：%4元" ).arg( year ).arg( month ).arg( day ).arg(allprice));
+}
+
+void MainWindow::on_closebutton_clicked()
+{
+    this->close();
+}
+
+void MainWindow::on_savebutton_2_clicked()
+{
+    save_game();
+    ui->checklabel_right->setText("保存当前数据成功！");
+}
+
+void MainWindow::on_closebutton_2_clicked()
+{
+    this->close();
 }

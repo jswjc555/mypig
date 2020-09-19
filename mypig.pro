@@ -26,11 +26,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    zhujuan.cpp
+        zhujuan.cpp
 
 HEADERS += \
         mainwindow.h \
-    zhujuan.h
+        zhujuan.h
 
 FORMS += \
         mainwindow.ui
@@ -39,3 +39,4 @@ DISTFILES +=
 
 RESOURCES += \
     pig_image.qrc
+

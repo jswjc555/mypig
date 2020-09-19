@@ -140,12 +140,15 @@ double zhujuan::returnprice(int a,int &all0,int &all1, int &all2,int price0,int 
     if (head == NULL )
         return 0;
     cout << "juanpig_num:"<<juanpig_num;
-    //piglist *p =head , *p0 = p;
     p =head;
     p0 = p;
     for(int j = 0; j<a&&p; j++){
-        cout << "j:" << j;
-        if (p->czmonth >= 12 || p->weight > 130){//设置卖猪的条件
+        if(plaguepig[j] == 1){
+            cout << "瘟猪不卖";
+            continue;
+        }
+        else{
+        if (p->czmonth >= 12 || p->weight > 90){//设置卖猪的条件
             if(p->species == 0){
                 sellprice += price0*p->weight;
                 all0--;
@@ -161,6 +164,8 @@ double zhujuan::returnprice(int a,int &all0,int &all1, int &all2,int price0,int 
             cout;
             del_pig(p);
             continue;
+          }
+
         }
         cout;
         p0 = p;
