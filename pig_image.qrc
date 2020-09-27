@@ -12,5 +12,8 @@
         <file>pig_image/2_2.png</file>
         <file>pig_image/2_3.png</file>
         <file>pig_image/none.png</file>
+        <file>pig_image/background.png</file>
+        <file>pig_image/title.png</file>
+        <file>pig_image/juan_01.png</file>
     </qresource>
 </RCC>

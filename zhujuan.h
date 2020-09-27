@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include "time.h"
 #include <QDebug>
+#include <QTime>
 struct piglist
 {
    double weight;
@@ -31,7 +32,7 @@ public:
     void setjuanpig_no(int a);
     void pig_grow(int d, int b);//随即成长函数，b对应juanpig_num
     double returnprice(int a,int &all0,int &all1,int &all2,int price0,int price1,int price2);//该猪圈该次出圈卖的钱数
-    void show_zhujuan(int a);//查询猪圈信息
+    QString show_zhujuan(int a);//查询猪圈信息
     QString show_zhuzhu(int a);//查询某头猪的信息
     void plus_num();
     int getisplague(int a);//查询本圈a号坑位的猪的属性

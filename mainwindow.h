@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTimer>
+#include <QTime>
 #include <cstdlib>
 #include "zhujuan.h"
 #include <QProgressBar>
@@ -42,20 +43,20 @@ private:
     int month,fakemonth;
     int year;
     int pass_day;//每一跳度过的时间
-    double sellprice;
-    double allprice;
+    double sellprice;//一次卖的价钱
+    double allprice;//玩家拥有的总价钱
     int maxprice0,maxprice1,maxprice2;
     int all0,all1,all2,allplague;//种类个数统计
-    int sellpig[3][5] ,buypig[3][5];
-    int sellpriceyear[5] ;
+    int sellpig[3][5] ,buypig[3][5];//五年销售记录
+    int sellpriceyear[5] ;//五年销售记录
     double weight0,weight1,weight2;//种类体重统计
     int feed3,feed6,feed9,feed12;//饲养时间分布
     zhujuan *hogpen[100];//100个猪圈
     int flag;//新猪平均分配
     int tm_startID;
-    bool isplaue;
+    bool isplaue;//判断是否是猪瘟模式
     int price0,price1,price2;
-    QChart *chart,*chart1,*chart2;
+    QChart *chart,*chart1,*chart2;//实时显示猪圈状态信息的图表
 
     Ui::MainWindow *ui;
 private slots:

@@ -120,11 +120,20 @@ double zhujuan::getweight(int a)
 
 void zhujuan::pig_grow(int d , int b)//小猪成长函数并刷新猪的成长数值
 {
-    srand(time(NULL));
     piglist *p = head;
+    QTime time= QTime::currentTime();
+    qsrand(time.msec()+time.second()*1000);
     for(int j = 0; j<b&&p; j++){
 //        p->weight += (double)(rand()%12)*d/10*(1-p->weight/75+0.3);
-        p->weight += (double)(rand()%12)*d/10;
+        int a = qrand()%100;
+        if(p->weight <= 87)
+            p->weight += (double)(rand()%12)*d/10;
+        else if (p->weight > 87 && a%2==0) {
+            p->weight += (double)(rand()%12)*d/10;
+        }
+        else if (p->weight > 87 && a%2==1) {
+            p->weight -= (double)(rand()%12)*d/10;
+        }
         p->czday += d;
         if(p->czday >= 30){
             p->czmonth++;
@@ -175,8 +184,9 @@ double zhujuan::returnprice(int a,int &all0,int &all1, int &all2,int price0,int 
     return sellprice;
 }
 
-void zhujuan::show_zhujuan(int a)
+QString zhujuan::show_zhujuan(int a)
 {
+    QString str;
     spe0 = 0;
     spe1 = 0;
     spe2 = 0;
@@ -191,8 +201,10 @@ void zhujuan::show_zhujuan(int a)
             spe2++;
         p = p->next;
     }
-
+    str = QString::number(juanpig_no) +"号猪圈\n" + "黑猪有:   " +QString::number(spe0) +"头\n"+"小花猪有:   " +QString::number(spe1) +"头\n"
+            +"大花白猪有:   " +QString::number(spe2) +"头\n";
     cout << juanpig_no << "号猪圈   黑猪有" << spe0 << "头， 小花猪有" << spe1 << "头，大花白猪有" << spe2<< "头";
+    return str;
 }
 
 QString zhujuan::show_zhuzhu(int a)

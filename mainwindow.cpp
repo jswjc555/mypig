@@ -8,8 +8,8 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
 {
     ui->setupUi(this);
     this->setWindowTitle("养猪模拟");
-    resize(800,770);
-    ui->stackedWidget->resize(800,770);
+    this->setFixedSize(800,770);
+    ui->stackedWidget->setFixedSize(800,770);
     day = 0;
     month = 0;
     year = 0;
@@ -37,21 +37,23 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
 
     //第一次初始化，加点猪猪
     srand(time(NULL));
-    price0 = rand()% 10 +20;
-    price1 = rand()% 12 +8 ;
-    price2 = rand()%8  +8;
+    QTime time= QTime::currentTime();
+    qsrand(time.msec()+time.second()*1000);
+    price0 = qrand()% 10 +20;
+    price1 = qrand()% 12 +8 ;
+    price2 = qrand()%8  +8;
     maxprice0 = price0;
     maxprice1 = price1;
     maxprice2 = price2;
-    int a = rand()%20+10;//开始拥有随机10-30头猪
+    int a = qrand()%20+10;//开始拥有随机10-30头猪
     qDebug() << "初始有" << a << "头猪" ;
     for(int i = 0; i < a;i++){
         piglist *p = new piglist;
         p->next = NULL;
         p->czday = 0;
         p->czmonth = 0;
-        p->species = rand()%3;
-        p->weight = rand()%30+10;
+        p->species = qrand()%3;
+        p->weight = qrand()%30+10;
         hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);//初始化不用判断是否为黑猪圈
         if(hogpen[i]->getspecies(0) == 0){
             all0++;
@@ -111,7 +113,18 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
                                 .arg(price0).arg(price1).arg(price2));
     ui->pig_image->setScaledContents(true);
     ui->end_image->setScaledContents(true);
-
+    ui->title_lable->setScaledContents(true);
+    QImage *image = new QImage;
+    image->load(":/pig_image/title.png");
+    ui->title_lable->setPixmap(QPixmap::fromImage(*image));
+    setAutoFillBackground(true);
+           QPalette palette = this->palette();
+           palette.setBrush(QPalette::Window,
+           QBrush(QPixmap(":/pig_image/background.png").scaled( // 缩放背景图.
+                                       size(),
+                                       Qt::IgnoreAspectRatio,
+                                       Qt::SmoothTransformation))); // 使用平滑的缩放方式
+          setPalette(palette); // 至此, 已给widget加上了背景图.
 
     chushihuachart();
     chushihuachart1();
@@ -161,7 +174,6 @@ void MainWindow::updateprogress(){
         cout;
         QString str = "养猪场经过了" +QString::number(tm_now)+ "天，\n猪猪正在茁壮成长\n";
         for(int i=0;i<100;i++){
-            cout <<i;
             hogpen[i]->pig_grow(pass_day,hogpen[i]->getjuanpig_num());//改时间
             for(int j=0;j<hogpen[i]->getjuanpig_num();j++){
               switch (hogpen[i]->getspecies(j)) {//记录此次购入猪的种类
@@ -182,12 +194,13 @@ void MainWindow::updateprogress(){
 
            }
           if(isplaue == true && hogpen[i]->getspread()!=0){//专注本猪圈的传播，并且若传播成功改变周围猪圈传播模式
-              int a = rand()%100;
+              int a = qrand()%100;
+              cout << "a" <<a;
               if(hogpen[i]->getspread() == 2)//50%传播几率
                   for(int j = 0;hogpen[i]->getisplague(j)!=-1;j++){
                       if(hogpen[i]->getisplague(j) == 1)
                           continue;
-                      a = rand()%100;
+                      a = qrand()%100;
                       if(a > 50){
                           hogpen[i]->setplague(j,1);
                           allplague++;
@@ -197,8 +210,9 @@ void MainWindow::updateprogress(){
                   }
               else if (hogpen[i]->getspread() == 1) {
                  for(int j = 0;hogpen[i]->getisplague(j)!=-1;j++){
-                     a = rand()%100;
-                     if(a > 85){
+                     a = qrand()%100;
+                      cout << "a" <<a;
+                     if(a > 75){
                          hogpen[i]->setplague(j,1);
                          allplague++;
                          str += QString::number(i) + "号圈" + QString::number(j) +"号猪感染瘟疫\n";
@@ -234,12 +248,12 @@ void MainWindow::updateprogress(){
            }
         }
         int a0,a1,a2;
-        a0 = rand()%30+1;
-        a1 = rand()%24+1;
-        a2 = rand()% 16+1;
-        price0 = rand()% a0 +20;
-        price1 = rand()% a1 +8 ;
-        price2 = rand()% a2 + 8;
+        a0 = qrand()%30+1;
+        a1 = qrand()%24+1;
+        a2 = qrand()% 16+1;
+        price0 = qrand()% a0 +20;
+        price1 = qrand()% a1 +8 ;
+        price2 = qrand()% a2 + 8;
         if (price0 > maxprice0)
             maxprice0 = price0;
         else if (price1 > maxprice1) {
@@ -273,15 +287,15 @@ void MainWindow::chujuangouzhu()
             //           qDebug() << i << "圈卖猪" << sellprice;
         }
 
-        int a = rand()%40+70;//每次新购入70-100头猪
+        int a = qrand()%40+40;//每次新购入40-80头猪
         int black=0,small=0,big=0,buyprice=0;
         for(int i = 0;i < a;i++){
             piglist *p = new piglist;
             p->next = NULL;
             p->czday = 0;
             p->czmonth = 0;
-            p->species = rand()%3;
-            p->weight = rand()%30+20;
+            p->species = qrand()%3;
+            p->weight = qrand()%30+20;
             switch (p->species) {//记录此次购入猪的种类
             case 0:{
                 black++;
@@ -605,6 +619,7 @@ void MainWindow::read_game()
     if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << ("打开文件失败");
+        ui->readbutton->setText("打开文件失败");
     }
     QTextStream txtInput(&f);
     QString lineStr;
@@ -716,7 +731,9 @@ void MainWindow::initplague()
     allplague += 1;
     int plague =0;//随机选一只猪得瘟疫，plague等于1的时候跳出循环
     int num0 = all0+all1+all2;
-    int num = rand()%(num0);
+    int num = qrand()%(num0);
+    if(num == 0)
+        num++;//不能让0圈的猪成为第一头瘟猪，会有bug。。
     cout <<num;
     int flag,no;
     for (int i =0;i<100;i++){
@@ -828,11 +845,16 @@ void MainWindow::timerEvent(QTimerEvent *event)
 void MainWindow::on_checkjuan_clicked()
 {
     int juan_no ;
+    QImage *image = new QImage;
     juan_no = ui->juanpig_no->text().toInt();
     if(ui->juanpig_no->text().isEmpty())
         cout << "请输入0-99的猪圈编号";
-    else
-    hogpen[juan_no]->show_zhujuan(hogpen[juan_no]->getjuanpig_num());
+    else{
+        hogpen[juan_no]->show_zhujuan(hogpen[juan_no]->getjuanpig_num());
+        ui->checklabel_right->setText(hogpen[juan_no]->show_zhujuan(hogpen[juan_no]->getjuanpig_num()));
+        image->load(":/pig_image/juan_01.png");
+        ui->pig_image->setPixmap(QPixmap::fromImage(*image));
+    }
 
 }
 
@@ -910,6 +932,13 @@ void MainWindow::on_checkpig_clicked()
 void MainWindow::on_startgame_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->pagemain);
+//    QPalette palette = this->palette();
+//    palette.setBrush(QPalette::Window,
+//    QBrush(QPixmap(":/pig_image/0_3.png").scaled( // 缩放背景图.
+//                                size(),
+//                                Qt::IgnoreAspectRatio,
+//                                Qt::SmoothTransformation))); // 使用平滑的缩放方式
+//   setPalette(palette); // 至此, 已给widget加上了背景图.
 }
 
 
@@ -953,6 +982,7 @@ void MainWindow::on_plague_pig_clicked()
     ui->geli->setVisible(true);
     ui->savebutton->setVisible(false);
     ui->savebutton_2->setVisible(false);
+    ui->plague_pig->setVisible(false);
 }
 
 void MainWindow::on_geli_clicked()
