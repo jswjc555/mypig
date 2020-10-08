@@ -15,5 +15,9 @@
         <file>pig_image/background.png</file>
         <file>pig_image/title.png</file>
         <file>pig_image/juan_01.png</file>
+        <file>pig_image/start.png</file>
+        <file>pig_image/start_hover.png</file>
+        <file>pig_image/pigicon.png</file>
+        <file>pig_image/baiwanfuweng.png</file>
     </qresource>
 </RCC>

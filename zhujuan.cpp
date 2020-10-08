@@ -184,6 +184,38 @@ double zhujuan::returnprice(int a,int &all0,int &all1, int &all2,int price0,int 
     return sellprice;
 }
 
+double zhujuan::returnprice_true(int a, int price0, int price1, int price2)
+{
+    double sellprice = 0;
+    if (head == NULL )
+        return 0;
+    p =head;
+    p0 = p;
+    for(int j = 0; j<a&&p; j++){
+        if(plaguepig[j] == 1){
+            continue;
+        }
+        else{
+        if (p->czmonth >= 12 || p->weight > 90){//设置卖猪的条件
+            if(p->species == 0){
+                sellprice += price0*p->weight;
+            }
+            if(p->species == 1){
+                sellprice += price1*p->weight;
+            }
+            if(p->species == 2){
+                sellprice += price2*p->weight;
+            }
+            continue;
+          }
+
+        }
+        p0 = p;
+        p  = p0->next;
+    }
+    return sellprice;
+}
+
 QString zhujuan::show_zhujuan(int a)
 {
     QString str;
@@ -216,22 +248,19 @@ QString zhujuan::show_zhuzhu(int a)
             p = p->next;
         }
         if(getspecies(a)==0){
-            qDebug() << "该猪是黑猪   ";
             localprice = p->weight * 30;
             str = "品种： 黑猪\n\n\n";
         }
         else if (getspecies(a)==1) {
-            qDebug() << "该猪是小花猪   ";
             localprice = p->weight * 14;
             str = "品种： 小花猪\n\n\n";
         }
         else if (getspecies(a)==2) {
-           qDebug() << "该猪是大花白猪   ";
            localprice = p->weight * 12;
            str = "品种： 大花白猪\n\n\n";
         }
-        qDebug() << "该猪入圈时间是第" << p->inmonth << "月，第" << p->inday << "天\n"
-                 << "已经在这个猪圈里生活了" << p->czmonth << "个月" << p->czday << "天，该猪体重是" << p->weight << "公斤，可以卖" << localprice << "元";
+//        qDebug() << "该猪入圈时间是第" << p->inmonth << "月，第" << p->inday << "天\n"
+//                 << "已经在这个猪圈里生活了" << p->czmonth << "个月" << p->czday << "天，该猪体重是" << p->weight << "公斤，可以卖" << localprice << "元";
 
     if(p->weight <=40)
         str +="时期 ： 幼崽期\n\n\n";

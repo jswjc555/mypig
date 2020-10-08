@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
     ui->setupUi(this);
     this->setWindowTitle("养猪模拟");
     this->setFixedSize(800,770);
+    this->setWindowIcon(QIcon(":/pig_image/pigicon.png"));
     ui->stackedWidget->setFixedSize(800,770);
     day = 0;
     month = 0;
@@ -94,6 +95,8 @@ MainWindow::MainWindow(QWidget *parent) ://构造函数-------------------------
 //    }
 
 
+    ui->startgame->setStyleSheet("QPushButton{border-image: url(:/pig_image/start.png)}"
+                                 "QPushButton:hover{border-image: url(:/pig_image/start_hover.png)}");
     ui->stackedWidget->setCurrentWidget(ui->pagestart);
     ui->juanpig_no->setPlaceholderText("猪圈编号0-99");
     ui->juanpig_no->setAlignment(Qt::AlignCenter);
@@ -212,7 +215,7 @@ void MainWindow::updateprogress(){
                  for(int j = 0;hogpen[i]->getisplague(j)!=-1;j++){
                      a = qrand()%100;
                       cout << "a" <<a;
-                     if(a > 75){
+                     if(a > 65){
                          hogpen[i]->setplague(j,1);
                          allplague++;
                          str += QString::number(i) + "号圈" + QString::number(j) +"号猪感染瘟疫\n";
@@ -280,13 +283,20 @@ void MainWindow::chujuangouzhu()
         cout << "时间未过三个月，请耐心等待猪猪长大后再出圈哦~";
     ui->mainlabel_right->setText(tr( "时间未过三个月，请耐心\n等待猪猪们长大后再出圈哦~" ));
     }
-    else {
-        for(int i=0;i<100;i++){
-            cout << i <<"开始卖猪";
-            sellprice   +=   hogpen[i]->returnprice(hogpen[i]->getjuanpig_num(),all0,all1,all2,price0,price1,price2);
-            //           qDebug() << i << "圈卖猪" << sellprice;
-        }
 
+    else {
+        QString str;
+        for(int i=0;i<100;i++){
+            sellprice   +=   hogpen[i]->returnprice_true(hogpen[i]->getjuanpig_num(),price0,price1,price2);
+        }
+        str += "此次卖猪一共可以卖"+QString::number(sellprice) + "元\n 是否要卖猪，当前市场价格仍在波动，或许等一等会卖出更好的价钱哦~\n";
+        sellprice = 0;
+        int pd = MyMessageBoxx("可以卖猪了！",str);
+        if (pd == 1){
+            for(int i=0;i<100;i++){
+                sellprice   +=   hogpen[i]->returnprice(hogpen[i]->getjuanpig_num(),all0,all1,all2,price0,price1,price2);
+            }
+        }
         int a = qrand()%40+40;//每次新购入40-80头猪
         int black=0,small=0,big=0,buyprice=0;
         for(int i = 0;i < a;i++){
@@ -320,10 +330,8 @@ void MainWindow::chujuangouzhu()
             }
 
             }
-            qDebug() << "准备在" << flag << "圈加新猪" <<p->species<< "该圈是" << hogpen[flag]->getspecies(0);
             if(hogpen[flag]->getspecies(0) == 3){//如果是空猪圈，直接入圈
                 hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
-                qDebug() << "购猪（空猪圈）"<< flag ;
                 flag = (flag+1)%100;
 
             }
@@ -334,24 +342,20 @@ void MainWindow::chujuangouzhu()
                 if(hogpen[flag]->getspecies(0) == 0 && p->species != 0){//黑猪只能进黑猪圈
                     while(hogpen[flag]->getspecies(0) == 0)
                         flag = (flag+1)%100;
-                    qDebug() << "购猪，推移(花猪圈)"<< flag ;
                     hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
                 else if (hogpen[flag]->getspecies(0) != 0 && p->species == 0) {
                     while(hogpen[flag]->getspecies(0) ==1 || hogpen[flag]->getspecies(0) == 2)
                         flag = (flag+1)%100;
-                    qDebug() << "购猪，推移(黑猪圈)"<< flag ;
                     hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
                 else if (hogpen[flag]->getspecies(0) == 0 && p->species == 0) {
-                    qDebug() << "购猪，(黑猪圈)"<< flag ;
                     hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
                 else {
-                    qDebug() << "购猪，(花猪圈)"<< flag ;
                     hogpen[flag]->add_pig(p,hogpen[flag]->getjuanpig_num(),day,month);
                     flag = (flag+1)%100;
                 }
@@ -375,11 +379,9 @@ void MainWindow::chujuangouzhu()
         allprice -= buyprice;
 
         sellpriceyear[year] += sellprice;
-        qDebug() << "这次卖了" << sellprice << "元,你现在一共有"<< allprice<<"元请继续加油哦";
         buypig[0][year] += black;
         buypig[1][year] += small;
         buypig[2][year] += big  ;
-        qDebug() << "此次购入" << a << "头猪其中" << black << "只黑猪" << small << "只小花猪" << big << "只大花白猪" ;
         ui->mainlabel_right->setText(tr( "这次卖了%1元\n此次购入%2头猪\n其中%3只黑猪崽儿\n%4只小花猪崽儿\n%5只大花白猪崽儿\n共花费 %6 元" )
                                      .arg(sellprice).arg(a).arg(black).arg(small).arg(big).arg(buyprice));
         ui->mainlabel_up->setText(tr( "现在是%1年 %2月  %3日\n 金钱：%4元" ).arg( year ).arg( month ).arg( day ).arg(allprice));
@@ -392,6 +394,14 @@ void MainWindow::chujuangouzhu()
         image->load(":/pig_image/pochan.png");
         ui->end_image->setPixmap(QPixmap::fromImage(*image));
         ui->endlabel_down->setText(tr("猪场开业后的第%1 年的 %2 月 %3日，负债破产┭┮﹏┭┮").arg(year).arg(month).arg(day));
+    }
+    else if (allprice > 1000000) {
+        ui->stackedWidget->setCurrentWidget(ui->pageend);
+        QImage *image = new QImage;
+        image->load(":/pig_image/baiwanfuweng.png");
+        ui->end_image->setPixmap(QPixmap::fromImage(*image));
+        ui->endlabel_down->setText(tr("恭喜你，成为了百万富翁，你的人生从此走上巅峰！！"));
+
     }
 }
 MainWindow::~MainWindow()
@@ -463,9 +473,7 @@ void MainWindow::chushihuachart1()
     axis->append(categories);
     chart1->createDefaultAxes();//创建默认的左侧的坐标轴（根据 QBarSet 设置的值）
     chart1->setAxisX(axis, series);//设置坐标轴
-//![4]
 
-//![5]
     chart1->legend()->setVisible(true); //设置图例为显示状态
     chart1->legend()->setAlignment(Qt::AlignBottom);//设置图例的显示位置在底部
     ui->chartnum->setChart(chart1);
@@ -784,12 +792,7 @@ void MainWindow::initplague()
     cout << hogpen[flag-1]->getspread();
     cout << hogpen[flag]->getspread();
     cout << hogpen[flag+1]->getspread();
-//        for(int i=0;i<100;i++)
-//        {
-//            for(int j=0;j<10;j++){
-//                qDebug() << hogpen[i]->getisplague(j);
-//            }
-//        }
+
         chushihuachart1();
 }
 
@@ -798,6 +801,7 @@ int MainWindow::MyMessageBox(QString title, QString message)
      QMessageBox mymessage(QMessageBox::Information, title, message);
      QPushButton *btnYes = mymessage.addButton(("猪圈隔离"), QMessageBox::YesRole);
      QPushButton *btnNo = mymessage.addButton(("**猪栏隔离**"), QMessageBox::NoRole);
+     QPushButton *btnrej = mymessage.addButton(("返回"), QMessageBox::RejectRole);
      mymessage.resize(400,300);
      mymessage.exec();
      if ((QPushButton*)mymessage.clickedButton() == btnYes)
@@ -805,7 +809,25 @@ int MainWindow::MyMessageBox(QString title, QString message)
      else if ((QPushButton*)mymessage.clickedButton() == btnNo) {
          return 0;
      }
-     return 0;
+     else if((QPushButton*)mymessage.clickedButton() == btnrej){
+        return -1;
+     }
+     return -1;
+}
+
+int MainWindow::MyMessageBoxx(QString title, QString message)
+{
+    QMessageBox mymessage(QMessageBox::Information, title, message);
+    QPushButton *btnYes = mymessage.addButton(("卖猪！"), QMessageBox::YesRole);
+    QPushButton *btnNo = mymessage.addButton(("不卖了，再等等"), QMessageBox::NoRole);
+    mymessage.resize(400,300);
+    mymessage.exec();
+    if ((QPushButton*)mymessage.clickedButton() == btnYes)
+            return 1;
+    else if ((QPushButton*)mymessage.clickedButton() == btnNo) {
+        return 0;
+    }
+    return 0;
 }
 
 
@@ -932,13 +954,7 @@ void MainWindow::on_checkpig_clicked()
 void MainWindow::on_startgame_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->pagemain);
-//    QPalette palette = this->palette();
-//    palette.setBrush(QPalette::Window,
-//    QBrush(QPixmap(":/pig_image/0_3.png").scaled( // 缩放背景图.
-//                                size(),
-//                                Qt::IgnoreAspectRatio,
-//                                Qt::SmoothTransformation))); // 使用平滑的缩放方式
-//   setPalette(palette); // 至此, 已给widget加上了背景图.
+
 }
 
 
@@ -1011,7 +1027,7 @@ void MainWindow::on_geli_clicked()
           allprice -= fifteencash;
 
     }
-    else{
+    else if(a == 0){
          for(int i = 0;i<100;i++){
              if(hogpen[i]->getspread() == 1 || hogpen[i]->getspread() == 2)
                   hogpen[i]->setgeli();

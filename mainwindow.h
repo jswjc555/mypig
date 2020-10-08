@@ -27,16 +27,17 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     int getday();
-    void chushihuachart();//初始化chart
-    void chushihuachart1();
-    void chushihuachart2();
-    void getfeedtime_all();
-    void qt_write_txt();
-    void qt_read_txt();
-    void save_game();
-    void read_game();
-    void initplague();
-    int MyMessageBox(QString title, QString message);
+    void chushihuachart();//刷新显示猪圈体重信息的chart
+    void chushihuachart1();//刷新显示猪圈种类与个数信息的chart
+    void chushihuachart2();//刷新显示猪圈饲养分布信息的chart
+    void getfeedtime_all();//获取所有猪的饲养分布情况
+    void qt_write_txt();//将最近一年的销售情况写入文件
+    void qt_read_txt();//读取最近五年的销售情况
+    void save_game();//保存当前游戏数据并写入txt文件
+    void read_game();//读取txt文件初始化游戏内容
+    void initplague();//设置猪瘟模式
+    int MyMessageBox(QString title, QString message);//获取隔离栏的对话框的返回值
+    int MyMessageBoxx(QString title, QString message);//询问是否出圈购猪的对话框
 
 private:
     int day;//进行的总时间
@@ -60,8 +61,8 @@ private:
 
     Ui::MainWindow *ui;
 private slots:
-    void updateprogress();
-    void chujuangouzhu();
+    void updateprogress();//模拟游戏时间的进行和猪的成长
+    void chujuangouzhu();//将符合出圈条件的猪卖出并用随机数购买猪仔
 
 
 
